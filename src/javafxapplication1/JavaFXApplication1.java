@@ -4,32 +4,38 @@
  */
 package javafxapplication1;
 
-import java.io.File;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TreeView;
-import javafx.scene.control.TreeItem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.net.URL;
+import javafx.geometry.Insets;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 
 
 public class JavaFXApplication1 extends Application 
 { 
  
-    boolean modsLoaded;
-    boolean modsZero = true;
     int numOfModsLoaded;
+
+
+    @FXML
+    public Label modCounterDialog;
+
+    @FXML
+    public void initialize(){
+        modCounterDialog.setText("No mods loaded");
+        modCounterDialog.setPadding(new Insets(1, 1, 1, 1));
+    }   
 
 
     public static void main(String[] args) 
@@ -41,7 +47,7 @@ public class JavaFXApplication1 extends Application
     public void start(Stage primaryStage) throws Exception 
         {
             Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-            primaryStage.setTitle("Mod Loader X v0.1");
+            primaryStage.setTitle("Mod Loader X v0.1.2");
             primaryStage.setScene(new Scene(root, 900, 600));
             primaryStage.setResizable(false);
             primaryStage.show();
@@ -67,24 +73,49 @@ public class JavaFXApplication1 extends Application
         {
             // counter
             numOfModsLoaded += 1;
-            System.out.println("Mods: " + numOfModsLoaded);
-            System.out.println("..Mod Added..");           
 
-           
+            // messages
+            System.out.println("..Mod Added..");            
+            System.out.println("Mods: " + numOfModsLoaded);
+            modCounterDialog.setText("...Mod added in...");
+            modCounterDialog.autosize();
 
         }
 
     public void removeMod()
         {
-             // counter
-            if (modsZero = false){
-            numOfModsLoaded -= 1;
-            System.out.println("..Mod Removed..");
-            System.out.println("Mods: " + numOfModsLoaded);   
-            }
+         // counter + check if numOfModsLoaded is equal to zero, if it isn't, remove a mod
+         if (numOfModsLoaded != 0)
+         {
+         numOfModsLoaded -= 1;
+
+         // messages
+         System.out.println("..Mod Removed..");
+         System.out.println("Mods: " + numOfModsLoaded); 
+         modCounterDialog.setText("...Mod removed...");
+         modCounterDialog.autosize();
+         }
+
+
 
 
         }
+
+      public void clearMods()
+       {
+         // counter
+         numOfModsLoaded = 0;
+
+         // messages
+         System.out.println("...Mods cleared...");
+         System.out.println("Mods: " + numOfModsLoaded);
+         modCounterDialog.setText("...Mods cleared...");   
+         modCounterDialog.autosize();        
+
+
+
+       }
+
 
       public void modPathFinder()
        {
@@ -93,11 +124,10 @@ public class JavaFXApplication1 extends Application
 
       public void launcher()
        {
-
+           modCounterDialog.setText(".........Launching!"); 
+           Path coreJarPath = Paths.get("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/spacehaven.jar");
        }
-
-       
-       
+  
        
 
 

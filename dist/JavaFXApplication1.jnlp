@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="JavaFXApplication1.jar" size="3731" download="eager" />
+    <jar href="JavaFXApplication1.jar" size="4072" download="eager" />
   </resources>
   <jfx:javafx-desc  width="800" height="600" main-class="javafxapplication1.JavaFXApplication1"  name="JavaFXApplication1" />
   <update check="always"/>
