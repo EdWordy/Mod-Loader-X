@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="ModLoaderX.jar" size="5580" download="eager" />
+    <jar href="ModLoaderX.jar" size="8241" download="eager" />
   </resources>
   <jfx:javafx-desc  width="800" height="600" main-class="modloaderx.ModLoaderXController"  name="Mod Loader v0.1.3" />
   <update check="always"/>

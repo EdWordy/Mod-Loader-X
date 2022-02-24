@@ -13,7 +13,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="modloaderx.ModLoaderXController">
+<VBox prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="modloaderx.ModLoaderXController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -36,9 +36,9 @@
     </MenuBar>
     <SplitPane dividerPositions="0.2639198218262806, 0.7505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-        <AnchorPane prefHeight="534.0" prefWidth="282.0">
+        <AnchorPane fx:id="anchorPaneML" prefHeight="534.0" prefWidth="282.0">
           <children>
-            <Label alignment="CENTER" layoutX="17.0" layoutY="14.0" minWidth="60.0" prefHeight="27.0" prefWidth="200.0" style="&#10;" text="Mods Loaded" textAlignment="CENTER" wrapText="false" AnchorPane.bottomAnchor="532.0">
+            <Label alignment="CENTER" layoutX="57.0" layoutY="14.0" minWidth="60.0" prefHeight="27.0" prefWidth="200.0" style="&#10;" text="Mods Loaded" textAlignment="CENTER" wrapText="false" AnchorPane.bottomAnchor="532.0">
               <font>
                 <Font size="18.0" fx:id="x1" />
               </font>
@@ -47,23 +47,23 @@
               </textFill>
             </Label>
                   <TreeView fx:id="treeViewML" layoutX="5.0" layoutY="106.0" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="103.0" />
-                  <Label fx:id="modCounterDialog" layoutX="76.0" layoutY="512.0" prefHeight="17.0" prefWidth="95.0" text="No mods loaded" />
-                  <Button fx:id="clearModButton" layoutX="85.0" layoutY="534.0" mnemonicParsing="false" onAction="#clearMods" text="Clear mods" />
+                  <Label fx:id="modCounterDialog" layoutX="109.0" layoutY="511.0" prefHeight="17.0" prefWidth="95.0" text="No mods loaded" />
+                  <Button fx:id="clearModButton" layoutX="119.0" layoutY="534.0" mnemonicParsing="false" onAction="#clearMods" text="Clear mods" />
           </children>
         </AnchorPane>
-      <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0" prefHeight="394.0" prefWidth="430.0">
+      <AnchorPane id="Content" fx:id="anchorPaneVM" minHeight="-1.0" minWidth="-1.0" prefHeight="394.0" prefWidth="430.0">
         <children>
           <Label alignment="CENTER" font="$x1" layoutX="154.0" prefHeight="55.0" prefWidth="124.0" style="&#10;" text="View Mods" textAlignment="CENTER" textFill="$x2" wrapText="false" AnchorPane.bottomAnchor="518.0" AnchorPane.leftAnchor="154.0" AnchorPane.rightAnchor="153.0" AnchorPane.topAnchor="0.0" />
-                  <TreeView fx:id="treeViewVM" layoutX="74.0" layoutY="73.0" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="103.0" />
-                  <Button fx:id="addModButton" layoutX="121.0" layoutY="532.0" mnemonicParsing="false" onAction="#addMod" text="Add mod" />
-                  <Button fx:id="removeModButton" layoutX="235.0" layoutY="532.0" mnemonicParsing="false" onAction="#removeMod" text="Remove mod" />
+                  <TreeView fx:id="treeViewVM" layoutX="74.0" layoutY="73.0" onMouseDragged="#getInfo" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="103.0" />
+                  <Button fx:id="addModButton" layoutX="154.0" layoutY="532.0" mnemonicParsing="false" onAction="#addMod" text="Add mod" />
+                  <Button fx:id="removeModButton" layoutX="337.0" layoutY="532.0" mnemonicParsing="false" onAction="#removeMod" text="Remove mod" />
         </children>
       </AnchorPane>
-        <AnchorPane prefHeight="350.0" prefWidth="221.0">
+        <AnchorPane fx:id="anchorPaneD" prefHeight="350.0" prefWidth="221.0">
           <children>
-            <Label alignment="CENTER" font="$x1" layoutX="84.0" layoutY="14.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
-                  <TreeView fx:id="treeViewD" layoutX="-6.0" layoutY="103.0" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="103.0" />
-                  <Button fx:id="launchButton" layoutX="84.0" layoutY="536.0" mnemonicParsing="false" onAction="#launcher" text="Launch" />
+            <Label alignment="CENTER" font="$x1" layoutX="111.0" layoutY="14.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                  <Button fx:id="launchButton" layoutX="111.0" layoutY="534.0" mnemonicParsing="false" onAction="#launcher" text="Launch" />
+                  <Label fx:id="modDetails" layoutY="102.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="102.0" />
           </children>
         </AnchorPane>
       </items>
