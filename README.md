@@ -13,10 +13,12 @@ Current Features:
 
 TO DO:
 
--addMod function
+-addMod method
 
--removeMod function
+-removeMod method
 
--modCounter function
+-launcher method
+
+-modPathFinder method
 
 
