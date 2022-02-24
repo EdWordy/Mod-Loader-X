@@ -1,8 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
-package javafxapplication1;
+package modloaderx;
 
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -19,24 +15,51 @@ import java.net.URL;
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javafx.scene.control.TreeView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.Node;
 
 
 
-public class JavaFXApplication1 extends Application 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+public class ModLoaderXController extends Application 
 { 
- 
     int numOfModsLoaded;
-
 
     @FXML
     public Label modCounterDialog;
 
     @FXML
+    public TreeView<String> treeViewML;
+
+    @FXML
+    public TreeView<String> treeViewVM;
+
+    @FXML
+    public TreeView<String> treeViewD;
+
+    @FXML
+    Path rootPath = Paths.get("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods");
+
+    List<String> rootPaths = Arrays.asList("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods");
+
+    @FXML
     public void initialize(){
         modCounterDialog.setText("No mods loaded");
         modCounterDialog.setPadding(new Insets(1, 1, 1, 1));
-    }   
+        
+        TreeItem<String> root2 = new TreeItem<>("Mods");
 
+ 
+
+    }
 
     public static void main(String[] args) 
         {
@@ -47,12 +70,15 @@ public class JavaFXApplication1 extends Application
     public void start(Stage primaryStage) throws Exception 
         {
             Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-            primaryStage.setTitle("Mod Loader X v0.1.2");
+            primaryStage.setTitle("Mod Loader X v0.1.4");
             primaryStage.setScene(new Scene(root, 900, 600));
             primaryStage.setResizable(false);
             primaryStage.show();
-            
-            modPathFinder();
+
+
+
+
+
         }
 
     public void exitButtonClicked()
@@ -116,19 +142,12 @@ public class JavaFXApplication1 extends Application
 
        }
 
-
-      public void modPathFinder()
-       {
-           Path rootPath = Paths.get("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods");
-       }
-
       public void launcher()
        {
            modCounterDialog.setText(".........Launching!"); 
            Path coreJarPath = Paths.get("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/spacehaven.jar");
-       }
-  
-       
 
+
+       }
 
 }
