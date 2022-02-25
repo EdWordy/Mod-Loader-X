@@ -35,3 +35,14 @@ TO DO:
 
 
 
+---
+
+How to use:
+
+Download the latest release and run the executable jar file. You'll need java 8 installed to do so.
+
+---
+
+Thanks to:
+
+Paperfox, Gravelyn, Neato and a few others, along with Bugbyte. Cheers!
