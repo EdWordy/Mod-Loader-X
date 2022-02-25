@@ -1,6 +1,5 @@
-package modloaderx;
+package modloaderx2;
 
-import java.awt.List;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -13,7 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class findInfos {
 
-    public static void match(String glob, String location) throws IOException {
+    public static void find(String glob, String location) throws IOException {
 
 	final PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob);
 		
