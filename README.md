@@ -7,7 +7,7 @@ A modloader for Space Haven written in Java 8.
 
 
 
-Current Features:
+CURRENT FEATURES:
 
 -Menu: Quit
 
