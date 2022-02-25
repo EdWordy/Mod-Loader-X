@@ -15,15 +15,23 @@ Current Features:
 
 -dialog to display previous action (clear mods, add mod, remove mod, launch)
 
+-treeview of current mod folder (need to fix hierarchy)
+
+-a method that finds all the info.xml files
+
 
 
 TO DO:
 
--addMod method
+-addMod method (adds mods from selected treeview item to list and displays it in another treeview)
 
--removeMod method
+-removeMod method (removes mod from list)
 
--launcher method
+-clearMods method (removes all mods from list)
+
+-launcher method (unpack and repacks jar with modded assets and generates a textures file)
+
+-read info.xml file and display contents in an info pane
 
 
 
