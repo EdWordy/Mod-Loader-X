@@ -37,12 +37,12 @@ TO DO:
 
 ---
 
-How to use:
+HOW TO USE:
 
 Download the latest release and run the executable jar file. You'll need java 8 installed to do so.
 
 ---
 
-Thanks to:
+THANKS TO:
 
 Paperfox, Gravelyn, Neato and a few others, along with Bugbyte. Cheers!
