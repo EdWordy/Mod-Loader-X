@@ -15,7 +15,7 @@ CURRENT FEATURES:
 
 -dialog to display previous action (clear mods, add mod, remove mod, launch)
 
--treeview of current mod folder (need to fix hierarchy)
+-listview of current mod folder
 
 -a method that finds all the info.xml files
 
@@ -32,6 +32,8 @@ TO DO:
 -launcher method (unpack and repacks jar with modded assets and generates a textures file)
 
 -read info.xml file and display contents in an info pane
+
+-write event handler to control element selection
 
 
 
