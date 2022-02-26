@@ -20,7 +20,13 @@ import javafx.scene.control.Alert;
 
 public class ModLoaderXController extends Application {
 
-    public static TreeItem<String> branches;
+    public TreeItem<File> firstBranch;
+ 
+    public TreeItem<File> secondBranch;
+
+    public boolean  directory;
+
+    public static File[] branches;
 
     int numOfModsLoaded;
 
@@ -48,6 +54,9 @@ public class ModLoaderXController extends Application {
 
     @FXML
     public TreeView<File> treeViewVM;
+   
+    @FXML
+    public TreeItem<File> treeViewRootVM;
 
     @FXML
     public Label modCounterDialog;
@@ -111,7 +120,7 @@ public class ModLoaderXController extends Application {
       
     }
 
-    public static void findMods(String glob, String location) throws IOException {
+    private void findMods(String glob, String location) throws IOException {
      
         File f = new File(location);
         FilenameFilter filter = new FilenameFilter() {
@@ -132,14 +141,23 @@ public class ModLoaderXController extends Application {
         // prints them
         for (File g : files)
         {
-            branches = new TreeItem<>(g.getName());
-            System.out.println("Branch found at: " + branches);
+            firstBranch = new TreeItem<>(g);
+            System.out.println("Branch found at: " + firstBranch);  
         }
 
-        // create and populate treeViewVM with mods from path specified
+
+
 
 
       } 
+
+
+
+
+
+
+
+
 
     public void exitButtonClicked()
     {
@@ -149,9 +167,9 @@ public class ModLoaderXController extends Application {
     public void helpButtonClicked()
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.1.7 help");
+        alert.setTitle("Mod Loader X v0.1.8 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.1.7 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.1.8 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
@@ -165,21 +183,15 @@ public class ModLoaderXController extends Application {
     @FXML
     public void initialize() throws IOException{
 
+        // create new treeview for the View Mod panel
         TreeItem<File> treeViewRootVM = new TreeItem(new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/"));
         treeViewVM.setRoot(treeViewRootVM);
-
-
-
-        // check mod
-        //modSelected.checkMod();
 
          // check for info.xml
         findInfos.find(glob, path);
 
         // find mods and load into tree
         findMods(glob2, path);
-
-       // read first info
 
     }      
 
@@ -192,7 +204,7 @@ public class ModLoaderXController extends Application {
     public void start(Stage primaryStage) throws Exception 
     {
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.1.7");
+        primaryStage.setTitle("Mod Loader X v0.1.8");
         primaryStage.setScene(new Scene(root, 1200, 600));
         primaryStage.setResizable(false);
         primaryStage.show();

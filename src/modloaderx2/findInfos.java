@@ -24,11 +24,9 @@ public class findInfos {
 	Files.walkFileTree(Paths.get(location), new SimpleFileVisitor<Path>() {
 			
 		@Override
-		public FileVisitResult visitFile(Path p,
-				BasicFileAttributes attrs) throws IOException {
+		public FileVisitResult visitFile(Path p, BasicFileAttributes attrs) throws IOException {
 			if (pathMatcher.matches(p)) {
-				System.out.println("Info found at: " + p);
-
+                            System.out.println("Info found at: " + p);
 			}
 			return FileVisitResult.CONTINUE;
 			}
