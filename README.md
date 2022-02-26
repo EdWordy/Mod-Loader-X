@@ -15,7 +15,7 @@ CURRENT FEATURES:
 
 -dialog to display previous action (clear mods, add mod, remove mod, launch)
 
--treeview of current mod folder (need to fix hierarchy)
+-listview of current mod folder
 
 -a method that finds all the info.xml files
 
@@ -33,6 +33,8 @@ TO DO:
 
 -read info.xml file and display contents in an info pane
 
+-write event handler to control element selection
+
 
 
 ---
@@ -45,4 +47,4 @@ Download the latest release and run the executable jar file. You'll need java 8 
 
 THANKS TO:
 
-Paperfox, Gravelyn, Neato and a few others, along with Bugbyte. Cheers!
+Paperfox, Gravelyn, Neato, SagaciousZed and a few others, along with Bugbyte. Cheers!
