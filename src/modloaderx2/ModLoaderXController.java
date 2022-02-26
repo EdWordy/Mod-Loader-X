@@ -1,6 +1,7 @@
 package modloaderx2;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 import javafx.application.Application;
@@ -17,8 +18,9 @@ import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 
 
-
 public class ModLoaderXController extends Application {
+
+    public static TreeItem<String> branches;
 
     int numOfModsLoaded;
 
@@ -31,8 +33,6 @@ public class ModLoaderXController extends Application {
     private String path = "F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/";
 
     private String glob2 = "glob:**/************************/";
-   
-
 
     @FXML
     public AnchorPane anchorPaneML;
@@ -51,7 +51,6 @@ public class ModLoaderXController extends Application {
 
     @FXML
     public Label modCounterDialog;
-
 
 
     public void addMod()
@@ -73,23 +72,23 @@ public class ModLoaderXController extends Application {
 
     public void removeMod()
     {
-         // counter + check if numOfModsLoaded is equal to zero, if it isn't, remove a mod
-         if (numOfModsLoaded != 0)
-         {
-         numOfModsLoaded -= 1;
+        // counter + check if numOfModsLoaded is equal to zero, if it isn't, remove a mod
+        if (numOfModsLoaded != 0)
+        {
+        numOfModsLoaded -= 1;
 
-         // messages
-         System.out.println("..Mod Removed..");
-         System.out.println("Mods: " + numOfModsLoaded); 
-         modCounterDialog.setText("...Mod removed...");
-         modCounterDialog.autosize();
+        // messages
+        System.out.println("..Mod Removed..");
+        System.out.println("Mods: " + numOfModsLoaded); 
+        modCounterDialog.setText("...Mod removed...");
+        modCounterDialog.autosize();
 
         // remove the mod from the list        
 
 
+           
 
-
-         }
+        }
 
 
 
@@ -112,6 +111,36 @@ public class ModLoaderXController extends Application {
       
     }
 
+    public static void findMods(String glob, String location) throws IOException {
+     
+        File f = new File(location);
+        FilenameFilter filter = new FilenameFilter() {
+  
+        public boolean accept(File f, String name)
+            {
+                if (!name.toString().endsWith(".txt") && f.isDirectory() && !name.toString().endsWith("spacehaven_0.14.1") ){
+                    return f.isDirectory();
+                }
+                    return false;
+            }
+        };
+  
+        // Get all the names of the mod folders
+        // presentin the given directory
+        File[] files = f.listFiles(filter);
+
+        // prints them
+        for (File g : files)
+        {
+            branches = new TreeItem<>(g.getName());
+            System.out.println("Branch found at: " + branches);
+        }
+
+        // create and populate treeViewVM with mods from path specified
+
+
+      } 
+
     public void exitButtonClicked()
     {
         System.exit(0);
@@ -120,41 +149,37 @@ public class ModLoaderXController extends Application {
     public void helpButtonClicked()
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.1.6 help");
+        alert.setTitle("Mod Loader X v0.1.7 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.1.6 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.1.7 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
+    public void cursorCheck()
+    {
+        cursorOnMods = true;
+        System.out.println("Cursor Detected");
 
+    }
 
-
-
-
-
-
-    
     @FXML
     public void initialize() throws IOException{
 
-        // create and populate treeViewVM with mods from path specified
         TreeItem<File> treeViewRootVM = new TreeItem(new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/"));
         treeViewVM.setRoot(treeViewRootVM);
-        TreeItem<File> branch = new TreeItem<>();
-        treeViewRootVM.getChildren().addAll(branch);
-
-        System.out.println("Branches at: " + branch);
 
 
+
+        // check mod
+        //modSelected.checkMod();
 
          // check for info.xml
         findInfos.find(glob, path);
 
-        // find mods
-        findMods.find(glob2, path);
- 
-        // load mods
-        // loadMods.
+        // find mods and load into tree
+        findMods(glob2, path);
+
+       // read first info
 
     }      
 
@@ -167,7 +192,7 @@ public class ModLoaderXController extends Application {
     public void start(Stage primaryStage) throws Exception 
     {
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.1.6");
+        primaryStage.setTitle("Mod Loader X v0.1.7");
         primaryStage.setScene(new Scene(root, 1200, 600));
         primaryStage.setResizable(false);
         primaryStage.show();

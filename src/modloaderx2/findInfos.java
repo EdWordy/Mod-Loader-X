@@ -9,8 +9,13 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
 public class findInfos {
+
+    @FXML
+    public Label modDetails;
 
     public static void find(String glob, String location) throws IOException {
 
@@ -22,7 +27,7 @@ public class findInfos {
 		public FileVisitResult visitFile(Path p,
 				BasicFileAttributes attrs) throws IOException {
 			if (pathMatcher.matches(p)) {
-				System.out.println(p);
+				System.out.println("Info found at: " + p);
 
 			}
 			return FileVisitResult.CONTINUE;
@@ -36,3 +41,6 @@ public class findInfos {
 	});
     }
 }
+
+
+
