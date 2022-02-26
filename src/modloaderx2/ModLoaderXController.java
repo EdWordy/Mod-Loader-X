@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,23 +18,26 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.control.cell.MapValueFactory;
 
 
 public class ModLoaderXController extends Application {
 
+
+
     public TreeItem<File> firstBranch;
- 
-    public TreeItem<File> secondBranch;
 
-    public boolean  directory;
-
-    public static File[] branches;
+    public TreeItem<File> branches;
 
     int numOfModsLoaded;
 
     static boolean cursorOnMods;
 
-    public static Path CURRENT_PATH;
+    public Path CURRENT_PATH;
 
     private String glob = "glob:**/info.xml";
 
@@ -135,17 +140,21 @@ public class ModLoaderXController extends Application {
         };
   
         // Get all the names of the mod folders
-        // presentin the given directory
+        // present in the given directory
         File[] files = f.listFiles(filter);
 
         // prints them
         for (File g : files)
         {
             firstBranch = new TreeItem<>(g);
-            System.out.println("Branch found at: " + firstBranch);  
+            System.err.println("FirstBranch at : " + firstBranch);   
+            try {
+                branches = firstBranch;
+            } catch (Exception e) {
+            }
+            System.err.println("Branches at: " + branches);
+ 
         }
-
-
 
 
 
@@ -154,7 +163,17 @@ public class ModLoaderXController extends Application {
 
 
 
+    public void buildModTree(TreeItem<File> file)
+    {
+        // create new treeview for the View Mod panel
+        TreeItem<File> treeViewRootVM = new TreeItem(new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/"));
+        treeViewVM.setRoot(treeViewRootVM);
 
+
+        // add children
+        treeViewRootVM.getChildren().add(file);
+
+    }
 
 
 
@@ -177,21 +196,18 @@ public class ModLoaderXController extends Application {
     {
         cursorOnMods = true;
         System.out.println("Cursor Detected");
-
     }
 
     @FXML
     public void initialize() throws IOException{
 
-        // create new treeview for the View Mod panel
-        TreeItem<File> treeViewRootVM = new TreeItem(new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/"));
-        treeViewVM.setRoot(treeViewRootVM);
-
-         // check for info.xml
+        // check for info.xml
         findInfos.find(glob, path);
 
-        // find mods and load into tree
+        // find mods
         findMods(glob2, path);
+
+        buildModTree(firstBranch);
 
     }      
 
