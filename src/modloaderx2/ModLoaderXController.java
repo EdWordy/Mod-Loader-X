@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TreeItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
@@ -23,7 +23,9 @@ public class ModLoaderXController extends Application {
 
 
 
-    public TreeItem<File> firstBranch;
+
+
+    public ObservableList<String> root;
 
     public ObservableList<String> branches;
 
@@ -49,17 +51,16 @@ public class ModLoaderXController extends Application {
     public AnchorPane anchorPaneD;
 
     @FXML
-    public ListView<File> listViewML;
+    public ListView<String> listViewML;
 
     @FXML
-    public ListView<File> listViewVM;
+    public ListView<String> listViewVM;
    
     @FXML
-    public ListView<File> listViewRootVM;
+    public ListView<String> listViewRootVM;
 
     @FXML
     public Label modCounterDialog;
-
 
     public void addMod()
     {
@@ -119,6 +120,12 @@ public class ModLoaderXController extends Application {
       
     }
 
+    public void cursorCheck()
+    {
+        cursorOnMods = true;
+        System.out.println("Cursor Detected");
+    }
+
     private void findMods(String glob, String location) throws IOException {
      
         File f = new File(location);
@@ -126,6 +133,7 @@ public class ModLoaderXController extends Application {
   
         public boolean accept(File f, String name)
             {
+                // checks if its a directory, if it ends with .txt or if its the spacehaven asset folder
                 if (!name.toString().endsWith(".txt") && f.isDirectory() && !name.toString().endsWith("spacehaven_0.14.1") ){
                     return f.isDirectory();
                 }
@@ -136,27 +144,27 @@ public class ModLoaderXController extends Application {
         // Get all the names of the mod folders
         // present in the given directory
         File[] files = f.listFiles(filter);
-        // prints them
-        for (File g : files)
-        {
-            branches.add(g.toString());
-            System.err.println("Mod at : " + branches);
-        }
 
+ 
+        // create a root observablelist<String> object
+        root = FXCollections.observableArrayList(f.toString());
+        System.out.println("Root found at:" + root);
+       
+        // parses all the files in files, add them to branches, 
+        // prints them and then adds them to the mod viewer
+        for (File g : files) {
+        branches = FXCollections.observableArrayList(g.toString());
+        System.out.println("Mod found at: " + branches);
+        getMods(branches.toString());
 
-
-      } 
-
-
-
-
-    public void buildModTree()
-    {
+        } 
 
     }
 
-
-
+    public void getMods(String f)
+    {
+      listViewVM.getItems().add(f);
+    }
 
     public void exitButtonClicked()
     {
@@ -172,12 +180,6 @@ public class ModLoaderXController extends Application {
         alert.showAndWait();
     }
 
-    public void cursorCheck()
-    {
-        cursorOnMods = true;
-        System.out.println("Cursor Detected");
-    }
-
     @FXML
     public void initialize() throws IOException{
 
@@ -186,7 +188,6 @@ public class ModLoaderXController extends Application {
 
         // find mods
         findMods(glob2, path);
-
     }      
 
     public static void main(String[] args) 
@@ -203,5 +204,4 @@ public class ModLoaderXController extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
     }
-
 }
