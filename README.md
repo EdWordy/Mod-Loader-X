@@ -15,9 +15,11 @@ CURRENT FEATURES:
 
 -dialog to display previous action (clear mods, add mod, remove mod, launch)
 
--listview of current mod folder
+-listview of current mod folder and mods loaded, with items that switch between them.
 
 -a method that finds all the info.xml files
+
+
 
 
 
@@ -33,7 +35,7 @@ TO DO:
 
 -read info.xml file and display contents in an info pane
 
--write event handler to control element selection
+
 
 
 
