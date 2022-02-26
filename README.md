@@ -45,4 +45,4 @@ Download the latest release and run the executable jar file. You'll need java 8 
 
 THANKS TO:
 
-Paperfox, Gravelyn, Neato and a few others, along with Bugbyte. Cheers!
+Paperfox, Gravelyn, Neato, SagaciousZed and a few others, along with Bugbyte. Cheers!
