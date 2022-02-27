@@ -45,7 +45,7 @@ public class Mods {
 			
 		@Override
 		public FileVisitResult visitFile(Path p, BasicFileAttributes attrs) throws IOException {
-			if (pathMatcher2.matches(p) && pathMatcher2.toString().matches("!/spacehaven_0.14.1/*")) {
+			if (pathMatcher2.matches(p) && pathMatcher2.toString().contains("!/spacehaven_0.14.1/*")) {
                             System.out.println("files found at: " + p);
 			}
 			return FileVisitResult.CONTINUE;

@@ -3,10 +3,10 @@ package modloaderx2;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
@@ -37,6 +37,8 @@ public class ModLoaderXController extends Application {
     public String selectedModML;
 
     public ArrayList<String> selectedMods;
+
+    public ArrayList<String> selectedModsRemoved;
 
     public String selectedInfo;
 
@@ -77,23 +79,28 @@ public class ModLoaderXController extends Application {
     @FXML
     public Label selectedModDetails;
 
-
-    public void addMod() throws InvocationTargetException
+    public void addMod()
     {       
-        // duplicate check
-
-
         // add the mod to the Mods Loaded list
         if (selectedModVM != null){
         listViewML.getItems().add(selectedModVM);
 
         // removes the item from the View Mods list
         listViewVM.getItems().remove(selectedModVM);
-        System.err.println(selectedModVM + " added");
+        System.out.println(selectedModVM + " added");
+
+        // remove from the Selected Mods Removed list
+        selectedModsRemoved.remove(selectedModVM);
         
-        // add mods to the Selected Modss list
+        // add mods to the Selected Mods list
         selectedMods.add(selectedModVM);
-        System.out.println("Mods selected:" + selectedMods);
+
+        // duplicate check  
+        List<String> listWithoutDuplicates = selectedMods.stream().distinct().collect(Collectors.toList());
+        System.err.println("List without duplicates (ADD): " + listWithoutDuplicates);
+        selectedMods = (ArrayList<String>) listWithoutDuplicates;
+        System.out.println("Mods selected: " + selectedMods);
+        listViewML.getItems().setAll(selectedMods);
 
         // counter
         numOfModsLoaded += 1;
@@ -103,6 +110,7 @@ public class ModLoaderXController extends Application {
         System.out.println("Mods: " + numOfModsLoaded);
         modCounterDialog.setText("...Mod added in...");
         modCounterDialog.autosize();
+        selectedModDetails.setText(selectedMods.toString());
         }
 
     }
@@ -110,13 +118,6 @@ public class ModLoaderXController extends Application {
     public void removeMod()
     {
         if (selectedModML != null){
-
-        // duplicate check
-
-
-
-
-
 
         // remove the mod from the Mods Loaded list        
         listViewML.getItems().remove(selectedModML);
@@ -127,19 +128,33 @@ public class ModLoaderXController extends Application {
 
         // removes from the Selected Mods list
         selectedMods.remove(selectedModML);
-        System.out.println("Mods Selected:" + selectedMods);
+        System.out.println("Mods Selected: " + selectedMods);
 
-        // counter + check if numOfModsLoaded is equal to zero, if it isn't, remove a mod
-        if (numOfModsLoaded != 0)
-        {
-        numOfModsLoaded -= 1;
+        // remove from the Selected Mods Removed list
+        selectedModsRemoved.add(selectedModML);
+        System.err.println("Mods Deselected: " + selectedModsRemoved);
 
-        // messages
-        System.out.println("..Mod Removed..");
-        System.out.println("Mods: " + numOfModsLoaded); 
-        modCounterDialog.setText("...Mod removed...");
-        modCounterDialog.autosize();
-        }
+        // duplicate check  
+        List<String> listWithoutDuplicates = selectedModsRemoved.stream().distinct().collect(Collectors.toList());
+        System.err.println("List without duplicates (REMOVE): " + listWithoutDuplicates);
+        System.out.println("Mods selected: " + selectedMods);
+        selectedModsRemoved = (ArrayList<String>) listWithoutDuplicates;
+        System.out.println("Mods selected: " + selectedMods);
+        listViewVM.getItems().setAll(selectedModsRemoved);
+
+            // counter + check if numOfModsLoaded is equal to zero,
+            // if it isn't, remove a mod from the counter
+            if (numOfModsLoaded != 0)
+            {
+            numOfModsLoaded -= 1;
+
+            // messages
+            System.out.println("..Mod Removed..");
+            System.out.println("Mods: " + numOfModsLoaded); 
+            modCounterDialog.setText("...Mod removed...");
+            modCounterDialog.autosize();
+            selectedModDetails.setText(selectedMods.toString());
+            }
         }
     }
 
@@ -175,6 +190,9 @@ public class ModLoaderXController extends Application {
         selectedInfo = listViewVM.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (VM INFO) : " + selectedInfo);
         readInfos();
+
+        // TO DO
+
     }
 
     public void cursorCheckML()
@@ -190,6 +208,9 @@ public class ModLoaderXController extends Application {
         selectedInfo = listViewML.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (ML INFO) : " + selectedInfo);
         readInfos();
+
+        // TO DO
+
     }
 
     private void findModsAndBuildMenu(String glob, String location) throws IOException {
@@ -222,6 +243,8 @@ public class ModLoaderXController extends Application {
         branchesVM = FXCollections.observableArrayList(g.toString());
         System.out.println("Mod found at: " + branchesVM);
         getMods(branchesVM.toString());
+        selectedModsRemoved.addAll(branchesVM);
+        System.out.println("Mods added in: " + selectedModsRemoved);
         } 
     }
 
@@ -256,9 +279,9 @@ public class ModLoaderXController extends Application {
     {
         // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.2.2 help");
+        alert.setTitle("Mod Loader X v0.2.3 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.2.2 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.2.3 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
@@ -268,6 +291,11 @@ public class ModLoaderXController extends Application {
         // header message
         System.out.println("----- BEGINNING TO INITALIZE -----");
 
+        // setup the selected mods lists
+        selectedMods = new ArrayList<>();
+        selectedModsRemoved = new ArrayList<>();
+        System.out.println("ArrayLists for mods initalized!");
+
         // check for info.xml
         Mods.findInfos(glob, path);
 
@@ -276,9 +304,6 @@ public class ModLoaderXController extends Application {
 
         // find files
         Mods.findFiles(glob3, path);
-
-        // setup the selected mods list
-        selectedMods = new ArrayList<>();
 
         // footer message
         System.out.println("----- END INITALIZE -----");
@@ -293,7 +318,7 @@ public class ModLoaderXController extends Application {
     public void start(Stage primaryStage) throws Exception 
     {
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.2.2");
+        primaryStage.setTitle("Mod Loader X v0.2.3");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();
