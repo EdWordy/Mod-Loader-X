@@ -26,7 +26,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.2.4" />
+            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.2.7" />
           </items>
         </Menu>
       </menus>
@@ -46,10 +46,6 @@
                   <Label fx:id="modCounterDialog" layoutX="209.0" layoutY="511.0" prefHeight="17.0" prefWidth="95.0" text="No mods loaded" />
                   <Button fx:id="clearModButton" layoutX="218.0" layoutY="534.0" mnemonicParsing="false" onAction="#clearMods" text="Clear mods" />
                   <ListView fx:id="listViewML" editable="true" layoutX="57.0" layoutY="187.0" onMouseClicked="#cursorCheckML" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="104.0" />
-                  <Label fx:id="selectedModDetails" alignment="TOP_CENTER" contentDisplay="TEXT_ONLY" layoutX="8.0" layoutY="52.0" prefHeight="44.0" prefWidth="478.0" text="mods loaded" textAlignment="JUSTIFY">
-                     <font>
-                        <Font size="8.0" />
-                     </font></Label>
           </children>
         </AnchorPane>
       <AnchorPane id="Content" fx:id="anchorPaneVM" minHeight="-1.0" minWidth="-1.0" prefHeight="394.0" prefWidth="430.0">
@@ -57,16 +53,16 @@
           <Label alignment="CENTER" font="$x1" layoutX="165.0" layoutY="7.0" prefHeight="55.0" prefWidth="124.0" style="&#10;" text="View Mods" textAlignment="CENTER" textFill="$x2" wrapText="false" AnchorPane.bottomAnchor="511.0" AnchorPane.leftAnchor="165.0" AnchorPane.rightAnchor="142.0" AnchorPane.topAnchor="7.0" />
                   <Button fx:id="addModButton" layoutX="125.0" layoutY="536.0" mnemonicParsing="false" onAction="#addMod" text="Add mod" />
                   <Button fx:id="removeModButton" layoutX="331.0" layoutY="535.0" mnemonicParsing="false" onAction="#removeMod" text="Remove mod" />
-                  <ListView fx:id="listViewVM" editable="true" layoutX="-1.0" layoutY="103.0" onMouseClicked="#cursorCheckVM" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="-0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="103.0" />
+                  <ListView fx:id="listViewVM" editable="true" layoutX="-1.0" layoutY="104.0" onMouseClicked="#cursorCheckVM" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="-0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="104.0" />
         </children>
       </AnchorPane>
         <AnchorPane fx:id="anchorPaneD" prefHeight="350.0" prefWidth="221.0">
           <children>
             <Label alignment="CENTER" font="$x1" layoutX="141.0" layoutY="20.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
                   <Button fx:id="launchButton" layoutX="120.0" layoutY="534.0" mnemonicParsing="false" text="Load and Launch" />
-                  <Label fx:id="modDetails" alignment="TOP_CENTER" contentDisplay="TEXT_ONLY" layoutY="102.0" text="no info loaded" textAlignment="JUSTIFY" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="102.0">
+                  <Label fx:id="modDetails" alignment="TOP_CENTER" contentDisplay="TEXT_ONLY" layoutX="75.0" layoutY="100.0" text="no mods loaded" textAlignment="JUSTIFY" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="104.0">
                      <font>
-                        <Font size="10.0" />
+                        <Font size="8.0" />
                      </font></Label>
           </children>
         </AnchorPane>

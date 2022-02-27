@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -20,7 +21,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javax.xml.bind.JAXBException;
+import org.xml.sax.SAXException;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import static modloaderx2.Load.sw;
 
 public class ModLoaderXController extends Application {
 
@@ -81,6 +87,9 @@ public class ModLoaderXController extends Application {
     @FXML
     public Label selectedModDetails;
 
+    @FXML
+    public Label modDetails;
+
     public void addMod()
     {       
         // add the mod to the Mods Loaded list
@@ -116,7 +125,6 @@ public class ModLoaderXController extends Application {
         System.out.println("Mods: " + numOfModsLoaded);
         modCounterDialog.setText("...Mod added in...");
         modCounterDialog.autosize();
-        selectedModDetails.setText(selectedMods.toString());
         }
     }
 
@@ -160,7 +168,6 @@ public class ModLoaderXController extends Application {
             System.out.println("Mods: " + numOfModsLoaded); 
             modCounterDialog.setText("...Mod removed...");
             modCounterDialog.autosize();
-            selectedModDetails.setText(selectedMods.toString());
             }
         }
     }
@@ -182,10 +189,9 @@ public class ModLoaderXController extends Application {
         System.out.println("Mods: " + numOfModsLoaded);
         modCounterDialog.setText("...Mods cleared...");   
         modCounterDialog.autosize();  
-        selectedModDetails.setText("Mods Cleared");
     }
 
-    public void cursorCheckVM() throws IOException, JAXBException
+    public void cursorCheckVM() throws IOException, JAXBException, SAXException
     {
         // sets cursorOnMods to true and prints cursor detected
         cursorOnMods = true;
@@ -199,11 +205,10 @@ public class ModLoaderXController extends Application {
         selectedInfo = listViewVM.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (VM INFO) : " + selectedInfo);
         
-        //
         readInfoVM();
     }
 
-    public void cursorCheckML() throws IOException, JAXBException
+    public void cursorCheckML() throws IOException, JAXBException, SAXException
     {
         // sets cursorOnMods to true and prints cursor detected
         cursorOnMods = true;
@@ -262,7 +267,7 @@ public class ModLoaderXController extends Application {
         listViewVM.getItems().add(f);
     }
 
-    public void readInfoVM() throws JAXBException, IOException
+    public void readInfoVM() throws JAXBException, IOException, SAXException
     {
         // sets the string infoToReadVM equal to selected item in the listViewVM
         infoToReadVM = listViewVM.getSelectionModel().getSelectedItem();
@@ -279,10 +284,13 @@ public class ModLoaderXController extends Application {
 
         // loads the infos in the View Mods menu
         Load.loadInfoVM();
-         
+
+        //
+        System.err.println(sw);
+        modDetails.setText(sw.toString());
         }
     }
-    public void readInfoML() throws JAXBException, IOException
+    public void readInfoML() throws JAXBException, IOException, SAXException
     {
         // sets the string infoToReadML equal to selected item in the listViewML
         infoToReadML = listViewML.getSelectionModel().getSelectedItem();
@@ -300,7 +308,9 @@ public class ModLoaderXController extends Application {
         // loads the infos in the Mods Loaded menu
         Load.loadInfoML();
 
-        // set label equal to file
+        //
+        System.err.println(sw);
+        modDetails.setText(sw.toString());
         }
     }
 
@@ -314,9 +324,9 @@ public class ModLoaderXController extends Application {
     {
         // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.2.5 help");
+        alert.setTitle("Mod Loader X v0.2.7 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.2.5 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.2.7 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
@@ -337,7 +347,7 @@ public class ModLoaderXController extends Application {
         Load.modML = new mod();
 
         // setup the labels
-        selectedModDetails.setWrapText(true);
+        modDetails.setWrapText(true);
 
         // check for info.xml
         Find.findInfos(glob, path);
@@ -362,7 +372,7 @@ public class ModLoaderXController extends Application {
     { 
         // creates the root, sets it equal to the .fxml file and then sets the stage
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.2.5");
+        primaryStage.setTitle("Mod Loader X v0.2.7");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();

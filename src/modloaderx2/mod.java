@@ -20,9 +20,6 @@ public class mod {
 
     @XmlElement
     String name;
-    public String getName() {
-        return name;
-    }
 
     @XmlElement
     String author;
@@ -36,6 +33,9 @@ public class mod {
     @XmlElement
     String modid;
 
+    public String getName() {
+        return name;
+    }
     public String getAuthor() {
         return author;
     }
@@ -48,5 +48,6 @@ public class mod {
     public String getModID() {
         return modid;
     }
+
 }
 

@@ -1,19 +1,12 @@
 package modloaderx2;
 
-import com.sun.deploy.config.Config;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Result;
-import javax.xml.validation.Schema;
-import org.w3c.dom.Node;
-import org.xml.sax.ContentHandler;
 
 public class Load {
 
@@ -21,42 +14,50 @@ public class Load {
 
     public static mod modML;
 
-    public static File modVM2;
+    public static File modVMOut;
 
-    public static File modML2;
+    public static File modMLOut;
 
-    @FXML
-    public static Label modDetails;
-
-
+    public static StringWriter sw;
 
     public static mod loadInfoVM() throws JAXBException, IOException {
 
-        modVM2 = new File (ModLoaderXController.infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("/info.xml"));
-
         if (ModLoaderXController.infoToReadVM != null) {
+            // creates a new context and sets it equal to an instance of the mod class
             JAXBContext context = JAXBContext.newInstance(mod.class);
-            modVM = (mod) context.createUnmarshaller().unmarshal(new FileReader(ModLoaderXController.infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("/info.xml")));
-
+           
+             // unmarshal
+            modVM = (mod) context.createUnmarshaller().unmarshal(new FileReader(ModLoaderXController.infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml")));
+        
+            // initalize new stringwriter
+            sw = new StringWriter();
+            
+            // marshal and output to stringwriter
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(modVM, System.err);
-            }
-            return null;
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            marshaller.marshal(modVM, sw);
+        }
+        return null;
     }
 
     public static mod loadInfoML() throws JAXBException, IOException {
-       
-        modML2 = new File (ModLoaderXController.infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("/info.xml"));
 
         if (ModLoaderXController.infoToReadML != null) {
+            // creates a new context and sets it equal to an instance of the mod class
             JAXBContext context = JAXBContext.newInstance(mod.class);
-            System.err.println(ModLoaderXController.infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("/info.xml"));
-            modML = (mod) context.createUnmarshaller().unmarshal(new FileReader(ModLoaderXController.infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("/info.xml")));
             
+            // unmarshal
+            modML = (mod) context.createUnmarshaller().unmarshal(new FileReader(ModLoaderXController.infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml")));
+
+            // initalize new stringwriter
+            sw = new StringWriter();
+
+            // marshal and output to stringwriter
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(modML, System.err);
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            marshaller.marshal(modML, sw);
         }
         return null;
     }
@@ -64,8 +65,6 @@ public class Load {
     public void loadFiles() {
 
     }
-
-
 
 
 
