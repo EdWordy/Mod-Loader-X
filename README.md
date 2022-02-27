@@ -1,5 +1,5 @@
 # Mod-Loader-X
-version 0.1
+version 0.2.2
 
 A modloader for Space Haven written in Java 8.
 
