@@ -3,18 +3,9 @@ package modloaderx2;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -29,10 +20,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
+import javax.xml.bind.JAXBException;
 
 public class ModLoaderXController extends Application {
 
@@ -52,9 +40,17 @@ public class ModLoaderXController extends Application {
 
     public ArrayList<String> unloadedMods;
 
+    public static String infoToReadVM;
+
+    public static String infoToReadML;
+
     public String selectedInfo;
 
     public static ArrayList<Path> loadedInfos;
+
+    public static mod loadInfoVM;
+        
+    public static mod loadInfoML;
 
     public String glob = "glob:**/info.xml";
 
@@ -81,9 +77,6 @@ public class ModLoaderXController extends Application {
 
     @FXML
     public Label modCounterDialog;
-
-    @FXML
-    public Label modDetails;
 
     @FXML
     public Label selectedModDetails;
@@ -189,9 +182,10 @@ public class ModLoaderXController extends Application {
         System.out.println("Mods: " + numOfModsLoaded);
         modCounterDialog.setText("...Mods cleared...");   
         modCounterDialog.autosize();  
+        selectedModDetails.setText("Mods Cleared");
     }
 
-    public void cursorCheckVM() throws IOException
+    public void cursorCheckVM() throws IOException, JAXBException
     {
         // sets cursorOnMods to true and prints cursor detected
         cursorOnMods = true;
@@ -204,18 +198,12 @@ public class ModLoaderXController extends Application {
         // sets up the selected mods and selected infos
         selectedInfo = listViewVM.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (VM INFO) : " + selectedInfo);
+        
+        //
         readInfoVM();
-
-        // TO DO
-
-
-
-
-
-
     }
 
-    public void cursorCheckML() throws IOException
+    public void cursorCheckML() throws IOException, JAXBException
     {
         // sets cursorOnMods to true and prints cursor detected
         cursorOnMods = true;
@@ -228,15 +216,9 @@ public class ModLoaderXController extends Application {
         // sets up the selected mods and selected infos
         selectedInfo = listViewML.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (ML INFO) : " + selectedInfo);
+
+        //
         readInfoML();
-
-        // TO DO
-
-
-
-
-
-
     }
 
     private void findModsAndBuildMenu(String glob, String location) throws IOException {
@@ -280,10 +262,10 @@ public class ModLoaderXController extends Application {
         listViewVM.getItems().add(f);
     }
 
-    public void readInfoVM()
+    public void readInfoVM() throws JAXBException, IOException
     {
         // sets the string infoToReadVM equal to selected item in the listViewVM
-        String infoToReadVM = listViewVM.getSelectionModel().getSelectedItem();
+        infoToReadVM = listViewVM.getSelectionModel().getSelectedItem();
 
         // checks if the mod selected in the listview menu View Mods is null,
         // if not it runs a loop.
@@ -294,16 +276,16 @@ public class ModLoaderXController extends Application {
         // sees if loadedInfos contains the selected item and finds the xml file
         boolean contains = loadedInfos.toString().contains(infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
         System.err.println("Info found: " + contains);
-        
 
-
-
+        // loads the infos in the View Mods menu
+        Load.loadInfoVM();
+         
         }
     }
-    public void readInfoML()
+    public void readInfoML() throws JAXBException, IOException
     {
         // sets the string infoToReadML equal to selected item in the listViewML
-        String infoToReadML = listViewML.getSelectionModel().getSelectedItem();
+        infoToReadML = listViewML.getSelectionModel().getSelectedItem();
 
         // checks if the mod selected in the listview menu View Mods is null,
         // if not it runs a loop.
@@ -315,10 +297,10 @@ public class ModLoaderXController extends Application {
         boolean contains = loadedInfos.toString().contains(infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
         System.err.println("Info found: " + contains);
 
+        // loads the infos in the Mods Loaded menu
+        Load.loadInfoML();
 
-
-
-
+        // set label equal to file
         }
     }
 
@@ -350,8 +332,11 @@ public class ModLoaderXController extends Application {
         loadedInfos = new ArrayList<>();
         System.out.println("ArrayLists for mods initalized!");
 
+        // setup the selected mods mod
+        Load.modVM = new mod();
+        Load.modML = new mod();
+
         // setup the labels
-        modDetails.setWrapText(true);
         selectedModDetails.setWrapText(true);
 
         // check for info.xml
@@ -362,10 +347,6 @@ public class ModLoaderXController extends Application {
 
         // find files
         Find.findFiles(glob3, path);
-
-        // load info files
-
-
 
         // footer message
         System.out.println("----- END INITALIZE -----");
@@ -379,7 +360,7 @@ public class ModLoaderXController extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception 
     { 
-        // creates the root, sets it equal to my .fxml file and then sets the stage
+        // creates the root, sets it equal to the .fxml file and then sets the stage
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
         primaryStage.setTitle("Mod Loader X v0.2.5");
         primaryStage.setScene(new Scene(root, 1400, 600));
