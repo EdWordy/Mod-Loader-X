@@ -25,20 +25,23 @@ CURRENT FEATURES:
 
 -clearMods method (removes all mods from list1 and adds back to list2)
 
+-read info.xml file and display contents in an info pane
+
+- ...
+
 
 
 TO DO:
 
-
 -launcher method (unpack and repacks jar with modded assets and generates a textures file)
-
--read info.xml file and display contents in an info pane
 
 -more features!
 
 -loading and reading the .jar
 
 - ...
+
+
 
 ---
 
