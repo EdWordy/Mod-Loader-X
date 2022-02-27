@@ -26,7 +26,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v2.1" />
+            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.2.2" />
           </items>
         </Menu>
       </menus>
@@ -35,7 +35,7 @@
       <items>
         <AnchorPane fx:id="anchorPaneML" prefHeight="534.0" prefWidth="282.0">
           <children>
-            <Label alignment="CENTER" layoutX="159.0" layoutY="17.0" minWidth="60.0" prefHeight="27.0" prefWidth="200.0" style="&#10;" text="Mods Loaded" textAlignment="CENTER" wrapText="false" AnchorPane.bottomAnchor="529.0">
+            <Label alignment="CENTER" layoutX="148.0" layoutY="14.0" minWidth="60.0" prefHeight="27.0" prefWidth="200.0" style="&#10;" text="Mods to Load" textAlignment="CENTER" wrapText="false" AnchorPane.bottomAnchor="532.0">
               <font>
                 <Font size="18.0" fx:id="x1" />
               </font>
@@ -46,6 +46,7 @@
                   <Label fx:id="modCounterDialog" layoutX="209.0" layoutY="511.0" prefHeight="17.0" prefWidth="95.0" text="No mods loaded" />
                   <Button fx:id="clearModButton" layoutX="218.0" layoutY="534.0" mnemonicParsing="false" onAction="#clearMods" text="Clear mods" />
                   <ListView fx:id="listViewML" editable="true" layoutX="57.0" layoutY="187.0" onMouseClicked="#cursorCheckML" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="104.0" />
+                  <Label fx:id="selectedModDetails" alignment="CENTER" contentDisplay="TOP" layoutX="51.0" layoutY="52.0" prefHeight="34.0" prefWidth="393.0" text="Label" />
           </children>
         </AnchorPane>
       <AnchorPane id="Content" fx:id="anchorPaneVM" minHeight="-1.0" minWidth="-1.0" prefHeight="394.0" prefWidth="430.0">
@@ -58,8 +59,8 @@
       </AnchorPane>
         <AnchorPane fx:id="anchorPaneD" prefHeight="350.0" prefWidth="221.0">
           <children>
-            <Label alignment="CENTER" font="$x1" layoutX="141.0" layoutY="21.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
-                  <Button fx:id="launchButton" layoutX="141.0" layoutY="531.0" mnemonicParsing="false" text="Launch" />
+            <Label alignment="CENTER" font="$x1" layoutX="141.0" layoutY="20.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                  <Button fx:id="launchButton" layoutX="120.0" layoutY="534.0" mnemonicParsing="false" text="Load and Launch" />
                   <Label fx:id="modDetails" alignment="CENTER" contentDisplay="TEXT_ONLY" layoutY="102.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="102.0">
                      <font>
                         <Font size="8.0" />

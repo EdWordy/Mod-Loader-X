@@ -3,7 +3,10 @@ package modloaderx2;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
@@ -17,7 +20,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionModel;
 
 
 public class ModLoaderXController extends Application {
@@ -34,13 +36,19 @@ public class ModLoaderXController extends Application {
 
     public String selectedModML;
 
-    public  ObservableList<String> selectedMods = null;
+    public ArrayList<String> selectedMods;
 
-    private String glob = "glob:**/info.xml";
+    public String selectedInfo;
 
-    private String path = "F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/";
+    public static List<Path> selectedInfos;
 
-    private String glob2 = "glob:**/************************/";
+    public String glob = "glob:**/info.xml";
+
+    public static String path = "F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/";
+
+    public String glob2 = "glob:**/************************/";
+
+    public String glob3 = "glob:**/mods/**";
 
     @FXML
     public AnchorPane anchorPaneML;
@@ -58,20 +66,34 @@ public class ModLoaderXController extends Application {
     public ListView<String> listViewVM;
 
     @FXML
+    public ListView<String> listViewSM;
+
+    @FXML
     public Label modCounterDialog;
 
-    public void addMod()
-    {
+    @FXML
+    public Label modDetails;
 
-        // add the mod to the ML list
+    @FXML
+    public Label selectedModDetails;
+
+
+    public void addMod() throws InvocationTargetException
+    {       
+        // duplicate check
+
+
+        // add the mod to the Mods Loaded list
         if (selectedModVM != null){
         listViewML.getItems().add(selectedModVM);
+
+        // removes the item from the View Mods list
         listViewVM.getItems().remove(selectedModVM);
         System.err.println(selectedModVM + " added");
-
-
-
-
+        
+        // add mods to the Selected Modss list
+        selectedMods.add(selectedModVM);
+        System.out.println("Mods selected:" + selectedMods);
 
         // counter
         numOfModsLoaded += 1;
@@ -87,19 +109,26 @@ public class ModLoaderXController extends Application {
 
     public void removeMod()
     {
-
         if (selectedModML != null){
-        // remove the mod from the ML list        
+
+        // duplicate check
+
+
+
+
+
+
+        // remove the mod from the Mods Loaded list        
         listViewML.getItems().remove(selectedModML);
+
+        // adds the mod to the View Mods list
         listViewVM.getItems().add(selectedModML);
         System.err.println(selectedModML + " removed");
 
-        
+        // removes from the Selected Mods list
+        selectedMods.remove(selectedModML);
+        System.out.println("Mods Selected:" + selectedMods);
 
-
-
-
-           
         // counter + check if numOfModsLoaded is equal to zero, if it isn't, remove a mod
         if (numOfModsLoaded != 0)
         {
@@ -114,8 +143,14 @@ public class ModLoaderXController extends Application {
         }
     }
 
-    public void clearMods()
+    public void clearMods() throws IOException
     {
+        // rebuilds View Mods menu
+        listViewVM.getItems().addAll(selectedMods);
+
+        // clear mods from Mods Loaded list
+        listViewML.getItems().clear();
+
         // counter
         numOfModsLoaded = 0;
 
@@ -124,10 +159,6 @@ public class ModLoaderXController extends Application {
         System.out.println("Mods: " + numOfModsLoaded);
         modCounterDialog.setText("...Mods cleared...");   
         modCounterDialog.autosize();  
-
-        // clear mods from list
-        listViewML.getItems().clear();
-        //System.err.println(selectedMods.toString() + " cleared");
     }
 
     public void cursorCheckVM()
@@ -139,6 +170,11 @@ public class ModLoaderXController extends Application {
         // sets up the selection model to get the selected item
         selectedModVM = listViewVM.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (VM) : " + selectedModVM);
+
+        //Setsup the selected mods and selected infos
+        selectedInfo = listViewVM.getSelectionModel().getSelectedItem();
+        System.out.println("Current Selection (VM INFO) : " + selectedInfo);
+        readInfos();
     }
 
     public void cursorCheckML()
@@ -149,10 +185,16 @@ public class ModLoaderXController extends Application {
         // sets up the selection model to get the selected item
         selectedModML = listViewML.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (ML) : " + selectedModML);
+
+        //Setsup the selected mods and selected infos
+        selectedInfo = listViewML.getSelectionModel().getSelectedItem();
+        System.out.println("Current Selection (ML INFO) : " + selectedInfo);
+        readInfos();
     }
 
-    private void findMods(String glob, String location) throws IOException {
+    private void findModsAndBuildMenu(String glob, String location) throws IOException {
      
+        // creates a new File and FilenameFilter
         File f = new File(location);
         FilenameFilter filter = new FilenameFilter() {
   
@@ -170,7 +212,6 @@ public class ModLoaderXController extends Application {
         // present in the given directory
         File[] files = f.listFiles(filter);
 
- 
         // create a root observablelist<String> object
         rootVM = FXCollections.observableArrayList(f.toString());
         System.out.println("Root mod folder found at:" + rootVM);
@@ -182,36 +223,65 @@ public class ModLoaderXController extends Application {
         System.out.println("Mod found at: " + branchesVM);
         getMods(branchesVM.toString());
         } 
-
     }
 
     public void getMods(String f)
     {
+      // gets the mods and adds them to the listview named View Mods
       listViewVM.getItems().add(f);
+    }
+
+    public void readInfos()
+    {
+        // checks if the mod selected in the listview menu View Mods is null,
+        // if not it runs a loop.
+            if (selectedModVM != null)
+        {
+            System.err.println("read infos not null");
+
+           // TO DO
+
+
+
+        }
     }
 
     public void exitButtonClicked()
     {
+        // exits the program
         System.exit(0);
     }
 
     public void helpButtonClicked()
     {
+        // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.2.1 help");
+        alert.setTitle("Mod Loader X v0.2.2 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.2.1 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.2.2 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
     @FXML
     public void initialize() throws IOException{
 
+        // header message
+        System.out.println("----- BEGINNING TO INITALIZE -----");
+
         // check for info.xml
-        findInfos.find(glob, path);
+        Mods.findInfos(glob, path);
 
         // find mods
-        findMods(glob2, path);
+        findModsAndBuildMenu(glob2, path);    
+
+        // find files
+        Mods.findFiles(glob3, path);
+
+        // setup the selected mods list
+        selectedMods = new ArrayList<>();
+
+        // footer message
+        System.out.println("----- END INITALIZE -----");
     }      
 
     public static void main(String[] args) 
@@ -223,7 +293,7 @@ public class ModLoaderXController extends Application {
     public void start(Stage primaryStage) throws Exception 
     {
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.2.1");
+        primaryStage.setTitle("Mod Loader X v0.2.2");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();
