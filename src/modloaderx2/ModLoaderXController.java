@@ -54,13 +54,13 @@ public class ModLoaderXController extends Application {
 
     public String selectedInfo;
 
-    public static List<Path> selectedInfos;
+    public static ArrayList<Path> loadedInfos;
 
     public String glob = "glob:**/info.xml";
 
     public static String path = "F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/";
 
-    public String glob2 = "glob:**/************************/";
+    public String glob2 = "glob:**/************************/";  // mod name length max 24 characters
 
     public String glob3 = "glob:**/mods/**";
 
@@ -101,15 +101,14 @@ public class ModLoaderXController extends Application {
         // add mods to the Selected Mods list
         selectedMods.add(selectedModVM);
 
-        System.err.println(selectedModVM);
+        System.out.println(selectedModVM);
 
         // remove mod from the Unloaded Mods list
         boolean remove = unloadedMods.remove(selectedModVM.replaceAll("[\\p{Ps}\\p{Pe}]", ""));
-        System.err.println(remove);
 
         // duplicate check  
         List<String> listWithoutDuplicates = selectedMods.stream().distinct().collect(Collectors.toList());
-        System.err.println("List without duplicates (SELECTED): " + listWithoutDuplicates);
+        System.out.println("List without duplicates (SELECTED): " + listWithoutDuplicates);
         selectedMods = (ArrayList<String>) listWithoutDuplicates;
         System.out.println("Mods selected (SELECTED): " + selectedMods);
         System.out.println("Mods selected (UNLOADED): " + unloadedMods.toString());
@@ -134,7 +133,7 @@ public class ModLoaderXController extends Application {
 
         // remove the mod from the Mods Loaded list        
         listViewML.getItems().remove(selectedModML);
-        System.err.println(selectedModML + " removed");
+        System.out.println(selectedModML + " removed");
 
         // adds the mod to the View Mods list
         listViewVM.getItems().add(selectedModML);
@@ -149,7 +148,7 @@ public class ModLoaderXController extends Application {
 
         // duplicate check  
         List<String> listWithoutDuplicates = unloadedMods.stream().distinct().collect(Collectors.toList());
-        System.err.println("List without duplicates (UNLOADED): " + listWithoutDuplicates);
+        System.out.println("List without duplicates (UNLOADED): " + listWithoutDuplicates);
         unloadedMods = (ArrayList<String>) listWithoutDuplicates;
         System.out.println("Mods selected (UNLOADED): " + unloadedMods);
         System.out.println("Mods selected (SELECTED)" + selectedMods);
@@ -205,7 +204,7 @@ public class ModLoaderXController extends Application {
         // sets up the selected mods and selected infos
         selectedInfo = listViewVM.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (VM INFO) : " + selectedInfo);
-        // readInfos();
+        readInfoVM();
 
         // TO DO
 
@@ -229,7 +228,7 @@ public class ModLoaderXController extends Application {
         // sets up the selected mods and selected infos
         selectedInfo = listViewML.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (ML INFO) : " + selectedInfo);
-        // readInfos();
+        readInfoML();
 
         // TO DO
 
@@ -281,17 +280,42 @@ public class ModLoaderXController extends Application {
         listViewVM.getItems().add(f);
     }
 
-    public void readInfos(File f)
+    public void readInfoVM()
     {
+        // sets the string infoToReadVM equal to selected item in the listViewVM
+        String infoToReadVM = listViewVM.getSelectionModel().getSelectedItem();
+
         // checks if the mod selected in the listview menu View Mods is null,
         // if not it runs a loop.
-            if (cursorOnMods)
+        if (cursorOnMods && infoToReadVM != null)
         {
-            System.out.println("read infos not null");
-
-            // TO DO
-
+        System.out.println("read infos not null");
    
+        // sees if loadedInfos contains the selected item and finds the xml file
+        boolean contains = loadedInfos.toString().contains(infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
+        System.err.println("Info found: " + contains);
+        
+
+
+
+        }
+    }
+    public void readInfoML()
+    {
+        // sets the string infoToReadML equal to selected item in the listViewML
+        String infoToReadML = listViewML.getSelectionModel().getSelectedItem();
+
+        // checks if the mod selected in the listview menu View Mods is null,
+        // if not it runs a loop.
+        if (cursorOnMods && infoToReadML != null)
+        {
+        System.out.println("read infos not null");
+
+        // sees if loadedInfos contains the selected item and finds the xml file
+        boolean contains = loadedInfos.toString().contains(infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
+        System.err.println("Info found: " + contains);
+
+
 
 
 
@@ -308,9 +332,9 @@ public class ModLoaderXController extends Application {
     {
         // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.2.4 help");
+        alert.setTitle("Mod Loader X v0.2.5 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.2.4 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.2.5 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
@@ -323,6 +347,7 @@ public class ModLoaderXController extends Application {
         // setup the selected mods lists
         selectedMods = new ArrayList<>();
         unloadedMods = new ArrayList<>();
+        loadedInfos = new ArrayList<>();
         System.out.println("ArrayLists for mods initalized!");
 
         // setup the labels
@@ -356,7 +381,7 @@ public class ModLoaderXController extends Application {
     { 
         // creates the root, sets it equal to my .fxml file and then sets the stage
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.2.4");
+        primaryStage.setTitle("Mod Loader X v0.2.5");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();

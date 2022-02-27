@@ -9,6 +9,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 
 public class Find {
 
@@ -22,7 +23,7 @@ public class Find {
 		public FileVisitResult visitFile(Path p, BasicFileAttributes attrs) throws IOException {
 			if (pathMatcher.matches(p)) {
                             System.out.println("Info found at: " + p);
-
+                            ModLoaderXController.loadedInfos.add(p);
 			}
 			return FileVisitResult.CONTINUE;
 			}
@@ -34,6 +35,7 @@ public class Find {
 			}
 
 	});
+        System.out.println("Infos added to loadedInfos list: " + ModLoaderXController.loadedInfos.toString());
     }
 
     public static void findFiles(String glob, String location) throws IOException {
@@ -56,10 +58,7 @@ public class Find {
 			return FileVisitResult.CONTINUE;
 			}
 	});
-
     }
-
-
 }
 
 

@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-// SAMPLE XML
+// SAMPLE MOD INFO XML FILE
 //  <mod>
 //      <name>Merc's Sound Pack</name>
 //      <author>TedDraws#0648 aka Mercenary</author>
@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement
-public class xml {
+public class Xml {
 
     String name;
     String author;
@@ -44,6 +44,7 @@ public class xml {
     public void setAuthor(String name) {
         this.author = name;
     }
+
     public String getDescription() {
         return description;
     }
@@ -53,5 +54,22 @@ public class xml {
         this.description = name;
     }
 
- 
+    public String getGameVersions() {
+        return gameVersions;
+    }
+
+    @XmlElement
+    public void setGameVersions(String name) {
+        this.gameVersions = name;
+    } 
+
+    public String getModid() {
+        return modid;
+    }
+
+    @XmlElement
+    public void setModid(String name) {
+        this.modid = name;
+    }
+    
 }
