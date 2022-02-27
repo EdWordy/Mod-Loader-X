@@ -35,9 +35,9 @@ TO DO:
 
 -launcher method (unpack and repacks jar with modded assets and generates a textures file)
 
--more features!
-
 -loading and reading the .jar
+
+-more features!
 
 - ...
 
