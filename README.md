@@ -37,6 +37,10 @@ TO DO:
 
 -loading and reading the .jar
 
+-writing a generated_textures.xml file
+
+-writing a custom_textures_modid.png file
+
 -more features!
 
 - ...
