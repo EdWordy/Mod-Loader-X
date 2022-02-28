@@ -1,6 +1,5 @@
 package modloaderx2;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -14,10 +13,6 @@ public class Load {
 
     public static mod modML;
 
-    public static File modVMOut;
-
-    public static File modMLOut;
-
     public static StringWriter sw;
 
     public static mod loadInfoVM() throws JAXBException, IOException {
@@ -26,9 +21,9 @@ public class Load {
             // creates a new context and sets it equal to an instance of the mod class
             JAXBContext context = JAXBContext.newInstance(mod.class);
            
-             // unmarshal
+             // unmarshal  and concantanetate the brackets
             modVM = (mod) context.createUnmarshaller().unmarshal(new FileReader(ModLoaderXController.infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml")));
-        
+            
             // initalize new stringwriter
             sw = new StringWriter();
             
@@ -47,7 +42,7 @@ public class Load {
             // creates a new context and sets it equal to an instance of the mod class
             JAXBContext context = JAXBContext.newInstance(mod.class);
             
-            // unmarshal
+            // unmarshal and concantanetate the brackets
             modML = (mod) context.createUnmarshaller().unmarshal(new FileReader(ModLoaderXController.infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml")));
 
             // initalize new stringwriter
@@ -61,18 +56,6 @@ public class Load {
         }
         return null;
     }
-
-    public void loadFiles() {
-
-    }
-
-
-
-
-
-
-
-
 }
 
 

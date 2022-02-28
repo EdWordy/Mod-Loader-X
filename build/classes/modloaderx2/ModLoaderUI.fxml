@@ -26,7 +26,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.2.7" />
+            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.2.8" />
           </items>
         </Menu>
       </menus>
@@ -43,7 +43,7 @@
                 <Color red="0.624" green="0.624" blue="0.624" fx:id="x2" />
               </textFill>
             </Label>
-                  <Label fx:id="modCounterDialog" layoutX="209.0" layoutY="511.0" prefHeight="17.0" prefWidth="95.0" text="No mods loaded" />
+                  <Label fx:id="modCounterDialog" alignment="CENTER" layoutX="193.0" layoutY="511.0" prefHeight="17.0" prefWidth="123.0" text="No mods loaded" />
                   <Button fx:id="clearModButton" layoutX="218.0" layoutY="534.0" mnemonicParsing="false" onAction="#clearMods" text="Clear mods" />
                   <ListView fx:id="listViewML" editable="true" layoutX="57.0" layoutY="187.0" onMouseClicked="#cursorCheckML" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="104.0" />
           </children>
@@ -59,8 +59,8 @@
         <AnchorPane fx:id="anchorPaneD" prefHeight="350.0" prefWidth="221.0">
           <children>
             <Label alignment="CENTER" font="$x1" layoutX="141.0" layoutY="20.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
-                  <Button fx:id="launchButton" layoutX="120.0" layoutY="534.0" mnemonicParsing="false" text="Load and Launch" />
-                  <Label fx:id="modDetails" alignment="TOP_CENTER" contentDisplay="TEXT_ONLY" layoutX="75.0" layoutY="100.0" text="no mods loaded" textAlignment="JUSTIFY" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="104.0">
+                  <Button fx:id="launchButton" layoutX="120.0" layoutY="534.0" mnemonicParsing="false" onAction="#loadAndLaunch" text="Load and Launch" />
+                  <Label fx:id="modDetails" alignment="TOP_LEFT" contentDisplay="TEXT_ONLY" layoutX="75.0" layoutY="100.0" textAlignment="JUSTIFY" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="104.0">
                      <font>
                         <Font size="8.0" />
                      </font></Label>

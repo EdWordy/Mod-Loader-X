@@ -48,6 +48,5 @@ public class mod {
     public String getModID() {
         return modid;
     }
-
 }
 
