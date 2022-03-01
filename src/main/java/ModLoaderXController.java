@@ -1,20 +1,6 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import com.ximpleware.ModifyException;
+import com.ximpleware.NavException;
+import com.ximpleware.TranscodeException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,13 +8,27 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ListView;
-import javax.xml.bind.JAXBException;
+import org.apache.commons.io.FileUtils;
 import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXBException;
+import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 public class ModLoaderXController extends Application {
 
@@ -44,7 +44,7 @@ public class ModLoaderXController extends Application {
 
     public String selectedModML;
 
-    public static ArrayList<String> selectedMods;
+    public static ArrayList<String> selectedModsUI;
 
     public ArrayList<String> unloadedMods;
 
@@ -62,7 +62,19 @@ public class ModLoaderXController extends Application {
 
     public File[] modFolderContents;
 
+    private Object currentModID;
+
     public String glob = "glob:**/info.xml";
+
+    public String glob2 = "glob:**/********************************/";  // mod name length max 32 characters
+
+    // (TODO: make default directory selectable)
+
+    public String glob3 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/animations_****************";  // mod asset name length max 5 + 16 characters
+
+    public String glob4 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/haven_****************";  // mod asset name length max 5 + 16 characters
+
+    public String glob5 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/texts_****************";  // mod asset name length max 5 + 16 characters
 
     public static String path = "F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/";
 
@@ -74,13 +86,7 @@ public class ModLoaderXController extends Application {
 
     public static File source;
 
-    public static File sourceFile;
-
-    public static File outFilename;
-
-    public String glob2 = "glob:**/********************************/";  // mod name length max 32 characters
-
-    public String glob3 = "glob:**/mods/**";
+    public File outFileName;
 
     @FXML
     public AnchorPane anchorPaneML;
@@ -103,89 +109,87 @@ public class ModLoaderXController extends Application {
     @FXML
     public Label modDetails;
 
-    public void addMod()
-    {       
+    public void addMod() {
         // null check
-        if (selectedModVM != null){
-        // add the mod to the Mods Loaded list
-        listViewML.getItems().add(selectedModVM);
+        if (selectedModVM != null) {
+            // add the mod to the Mods Loaded listview
+            listViewML.getItems().add(selectedModVM);
 
-        // removes the item from the View Mods list
-        listViewVM.getItems().remove(selectedModVM);
-        System.out.println(selectedModVM + " added");
-        
-        // add mods to the Selected Mods list
-        selectedMods.add(selectedModVM.replaceAll("[\\p{Ps}\\p{Pe}]", ""));
+            // removes the item from the View Mods listview
+            listViewVM.getItems().remove(selectedModVM);
+            System.out.println(selectedModVM + " added");
 
-        // remove mod from the Unloaded Mods list
-        unloadedMods.remove(selectedModVM.replaceAll("[\\p{Ps}\\p{Pe}]", ""));
+            // add mods to the Selected Mods list
+            selectedModsUI.add(selectedModVM.replaceAll("[\\p{Ps}\\p{Pe}]", ""));
 
-        // duplicate check  
-        List<String> listWithoutDuplicates = selectedMods.stream().distinct().collect(Collectors.toList());
-        selectedMods = (ArrayList<String>) listWithoutDuplicates;
-        listViewML.getItems().setAll(selectedMods);
-        selectedModVM = null;
+            // remove mod from the Unloaded Mods list
+            unloadedMods.remove(selectedModVM.replaceAll("[\\p{Ps}\\p{Pe}]", ""));
 
-        // counter
-        numOfModsLoaded += 1;
+            // duplicate check
+            List<String> listWithoutDuplicates = selectedModsUI.stream().distinct().collect(Collectors.toList());
+            selectedModsUI = (ArrayList<String>) listWithoutDuplicates;
+            listViewML.getItems().setAll(selectedModsUI);
+            selectedModVM = null;
 
-        // messages
-        System.out.println("..Mod Added..");            
-        System.out.println("Mods: " + numOfModsLoaded);
-        modCounterDialog.setText("...Mod added in...");
-        modCounterDialog.autosize();
-        } 
+            // counter
+            numOfModsLoaded += 1;
+
+            // messages
+            System.out.println("..Mod Added..");
+            System.out.println("# of Mods loaded: " + numOfModsLoaded);
+            modCounterDialog.setText("...Mod added in...");
+            modCounterDialog.autosize();
+        }
     }
 
-    public void removeMod()
-    {
+    public void removeMod() {
         // null check
-        if (selectedModML != null){
+        if (selectedModML != null) {
 
-        // remove the mod from the Mods Loaded list        
-        listViewML.getItems().remove(selectedModML);
-        System.out.println(selectedModML + " removed");
+            // remove the mod from the Mods Loaded listview
+            listViewML.getItems().remove(selectedModML);
+            System.out.println(selectedModML + " removed");
 
-        // adds the mod to the View Mods list
-        listViewVM.getItems().add(selectedModML);
+            // adds the mod to the View Mods listview
+            listViewVM.getItems().add(selectedModML);
 
-        // removes the mod from the Selected Mods list
-        selectedMods.remove(selectedModML.replaceAll("[\\p{Ps}\\p{Pe}]", ""));
-        System.out.println("Mods Selected: " + selectedMods);
+            // removes the mod from the Selected Mods list
+            selectedModsUI.remove(selectedModML.replaceAll("[\\p{Ps}\\p{Pe}]", ""));
+            System.out.println("Mods Selected: " + selectedModsUI);
 
-        // add the mod to the Unloaded Mods list
-        unloadedMods.add(selectedModML);
-        System.out.println("Mods Deselected: " + unloadedMods);
+            // add the mod to the Unloaded Mods list
+            unloadedMods.add(selectedModML);
+            System.out.println("Mods Deselected: " + unloadedMods);
 
-        // duplicate check  
-        List<String> listWithoutDuplicates = unloadedMods.stream().distinct().collect(Collectors.toList());
-        unloadedMods = (ArrayList<String>) listWithoutDuplicates;
-        listViewVM.getItems().clear();
-        listViewVM.getItems().setAll(unloadedMods);
-        selectedModML = null;
+            // duplicate check
+            List<String> listWithoutDuplicates = unloadedMods.stream().distinct().collect(Collectors.toList());
+            unloadedMods = (ArrayList<String>) listWithoutDuplicates;
+            listViewVM.getItems().clear();
+            listViewVM.getItems().setAll(unloadedMods);
+            selectedModML = null;
 
             // counter + check if numOfModsLoaded is equal to zero,
             // if it isn't, remove a mod from the counter
-            if (numOfModsLoaded != 0)
-            {
-            numOfModsLoaded -= 1;
+            if (numOfModsLoaded != 0) {
+                numOfModsLoaded -= 1;
 
-            // messages
-            System.out.println("..Mod Removed..");
-            System.out.println("Mods: " + numOfModsLoaded); 
-            modCounterDialog.setText("...Mod removed...");
-            modCounterDialog.autosize();
+                // messages
+                System.out.println("..Mod Removed..");
+                System.out.println("# of Mods loaded: " + numOfModsLoaded);
+                modCounterDialog.setText("...Mod removed...");
+                modCounterDialog.autosize();
             }
         }
     }
 
-    public void clearMods() throws IOException
-    {
-        // rebuilds View Mods menu from mods selected
-        listViewVM.getItems().addAll(selectedMods);
-        selectedMods.clear();
+    public void clearMods() throws IOException {
+        // rebuilds View Mods menu from mods selected UI
+        listViewVM.getItems().addAll(selectedModsUI);
 
-        // clear mods from Mods Loaded list
+        // clear mod from selects mods
+        selectedModsUI.clear();
+
+        // clear mods from Mods Loaded listview
         listViewML.getItems().clear();
 
         // counter
@@ -193,13 +197,12 @@ public class ModLoaderXController extends Application {
 
         // messages
         System.out.println("...Mods cleared...");
-        System.out.println("Mods: " + numOfModsLoaded);
-        modCounterDialog.setText("...Mods cleared...");   
-        modCounterDialog.autosize();  
+        System.out.println("# of Mods loaded: " + numOfModsLoaded);
+        modCounterDialog.setText("...Mods cleared...");
+        modCounterDialog.autosize();
     }
 
-    public void cursorCheckVM() throws IOException, JAXBException, SAXException
-    {
+    public void cursorCheckVM() throws IOException, JAXBException, SAXException {
         // sets cursorOnMods to true and prints cursor detected
         cursorOnMods = true;
         System.out.println("Cursor Detected VM");
@@ -207,21 +210,20 @@ public class ModLoaderXController extends Application {
         // sets up the selection model to get the selected item
         selectedModVM = listViewVM.getSelectionModel().getSelectedItem();
         System.out.println("Current Selection (VM) : " + selectedModVM);
-         
+
         // null check
         if (selectedModVM != null) {
 
-        // sets up the selected mods and selected infos
-        selectedInfo = listViewVM.getSelectionModel().getSelectedItem();
-        System.out.println("Current Selection (VM INFO) : " + selectedInfo.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
-        
-        // calls read info for the View Mods listview
-        readInfoVM();
+            // sets up the selected mods and selected infos
+            selectedInfo = listViewVM.getSelectionModel().getSelectedItem();
+            System.out.println("Current Selection (VM INFO) : " + selectedInfo.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
+
+            // calls read info for the View Mods listview
+            readInfoVM();
         }
     }
 
-    public void cursorCheckML() throws IOException, JAXBException, SAXException
-    {
+    public void cursorCheckML() throws IOException, JAXBException, SAXException {
         // sets cursorOnMods to true and prints cursor detected
         cursorOnMods = true;
         System.out.println("Cursor Detected ML");
@@ -233,31 +235,30 @@ public class ModLoaderXController extends Application {
         // null check (usually only needed once for before any mods are selected)
         if (selectedModML != null) {
 
-        // sets up the selected mods and selected infos
-        selectedInfo = listViewML.getSelectionModel().getSelectedItem();
-        System.out.println("Current Selection (ML INFO) : " + selectedInfo.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
-        
-        // calls read info for the Mods Loaded listview
-        readInfoML();
+            // sets up the selected mods and selected infos
+            selectedInfo = listViewML.getSelectionModel().getSelectedItem();
+            System.out.println("Current Selection (ML INFO) : " + selectedInfo.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
+
+            // calls read info for the Mods Loaded listview
+            readInfoML();
         }
     }
 
     private void findModsAndBuildMenu(String glob, String location) throws IOException {
-     
+
         // creates a new File and FilenameFilter
         File f = new File(location);
         FilenameFilter filter = new FilenameFilter() {
-  
-        public boolean accept(File f, String name)
-            {
+
+            public boolean accept(File f, String name) {
                 // checks if its a directory, if it ends with .txt or if its the spacehaven asset folder
-                if (!name.endsWith(".txt") && f.isDirectory() && !name.endsWith("spacehaven_0.14.1") && !name.endsWith(".zip") && !name.endsWith("source")){
+                if (!name.endsWith(".txt") && f.isDirectory() && !name.endsWith("spacehaven_0.14.1") && !name.endsWith(".zip") && !name.endsWith("source")) {
                     return f.isDirectory();
                 }
-                    return false;
+                return false;
             }
         };
-  
+
         // Get all the names of the mod folders
         // present in the given directory
         File[] files = f.listFiles(filter);
@@ -265,193 +266,362 @@ public class ModLoaderXController extends Application {
         // create a root observablelist<String> object
         rootVM = FXCollections.observableArrayList(f.toString());
         System.out.println("Root mod folder found at: " + rootVM);
-       
+
         // parses all the files in files, add them to branches, 
         // prints them and then adds them to the mod viewer
         for (File g : files) {
-        branchesVM = FXCollections.observableArrayList(g.toString());
-        System.out.println("Mod found at: " + branchesVM);
-        getMods(branchesVM.toString());
-        unloadedMods.addAll(branchesVM);
-        } 
+            branchesVM = FXCollections.observableArrayList(g.toString());
+            System.out.println("Mod found at: " + branchesVM);
+            getMods(branchesVM.toString());
+            unloadedMods.addAll(branchesVM);
+        }
         System.out.println("Mods added to unloaded list: " + unloadedMods);
     }
 
-    public void getMods(String f)
-    {
+    public void getMods(String f) {
         // gets the mods and adds them to the listview named View Mods
         listViewVM.getItems().add(f);
     }
 
-    public void readInfoVM() throws JAXBException, IOException, SAXException
-    {
+    public void readInfoVM() throws JAXBException, IOException, SAXException {
         // sets the string infoToReadVM equal to selected item in the listViewVM
         infoToReadVM = listViewVM.getSelectionModel().getSelectedItem();
 
         // checks if the mod selected in the listview menu View Mods is null,
         // if not it runs a loop.
-        if (cursorOnMods && infoToReadVM != null)
-        { 
-        // sees if loadedInfos contains the selected item and finds the xml file
-        boolean contains = loadedInfos.toString().contains(infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
-        System.out.println("Info found: " + contains);
+        if (cursorOnMods && infoToReadVM != null) {
+            // sees if loadedInfos contains the selected item and finds the xml file
+            boolean contains = loadedInfos.toString().contains(infoToReadVM.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
+            System.out.println("Info found: " + contains);
 
-        // loads the infos in the View Mods menu
-        Load.loadInfoVM();
+            // loads the infos in the View Mods menu
+            Load.loadInfoVM();
 
-        // set modDetails label equal to Load string writer
-        modDetails.setText(Load.sw.toString());
+            // set modDetails label equal to Load string writer
+            modDetails.setText(Load.sw.toString());
         }
     }
-    public void readInfoML() throws JAXBException, IOException, SAXException
-    {
+
+    public void readInfoML() throws JAXBException, IOException, SAXException {
         // sets the string infoToReadML equal to selected item in the listViewML
         infoToReadML = listViewML.getSelectionModel().getSelectedItem();
 
         // checks if the mod selected in the listview menu View Mods is null,
         // if not it runs a loop.
-        if (cursorOnMods && infoToReadML != null)
-        {
-        // sees if loadedInfos contains the selected item and finds the xml file
-        boolean contains = loadedInfos.toString().contains(infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
-        System.out.println("Info found: " + contains);
+        if (cursorOnMods && infoToReadML != null) {
+            // sees if loadedInfos contains the selected item and finds the xml file
+            boolean contains = loadedInfos.toString().contains(infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml"));
+            System.out.println("Info found: " + contains);
 
-        // loads the infos in the Mods Loaded menu
-        Load.loadInfoML();
+            // loads the infos in the Mods Loaded menu
+            Load.loadInfoML();
 
-        // set modDetails label equal to Load string writer
-        modDetails.setText(Load.sw.toString());
+            // set modDetails label equal to Load string writer
+            modDetails.setText(Load.sw.toString());
         }
     }
 
-    public void loadAndLaunch() throws IOException {
-       
+    public void loadAndLaunch() throws IOException, NavException, ModifyException, TranscodeException {
+
         // messages
         System.out.println("----- loading -----");
         modCounterDialog.setText("...Loading...");
 
-        // checks if selectedMods is empty
-        if (!selectedMods.isEmpty()){
- 
-           // setups the paths to unpack
-           path2 = FileSystems.getDefault().getPath("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/spacehaven.jar");
-           path3 = FileSystems.getDefault().getPath("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/");
+        // checks if selectedModsUI is not empty
+        if (!selectedModsUI.isEmpty()) {
 
-           // setups the paths to unpack
-           jar = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/spacehaven.jar");
-           source = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/");
-            
+            // (TODO: make default paths selectable (2))
+            // setups the paths to unpack
+            path2 = FileSystems.getDefault().getPath("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/spacehaven.jar");
+            path3 = FileSystems.getDefault().getPath("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/");
+
+            // (TODO: make default paths selectable (3))
+            // setups the paths to unpack
+            jar = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/spacehaven.jar");
+            source = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/");
+
             // unpack jar
-           modCounterDialog.setText("... .jar unpacking...");
-           unzip(jar, source);
-           System.out.println(".Jar Unpacked!");
-           modCounterDialog.setText("... .jar unpacked...");
-             
+            //modCounterDialog.setText("... .jar unpacking...");
+            //unzip(jar, source);
+            //org.zeroturnaround.zip.ZipUtil.unpack(jar, source);
+
+            // messages
+            //System.out.println(".Jar Unpacked!");
+            //modCounterDialog.setText("... .jar unpacked...");
+
+            // messages
             System.out.println("...parsing mods....");
             modCounterDialog.setText("...parsing mods....");
-            // parse selected mods
-            // for each string f in selectedMods do such
-            for (String f : selectedMods){
 
-                // creates a new file and sets it equal to f
+            // parse selectedModsUI
+            // for each string f in selectedModsUI do such
+            for (String f : selectedModsUI) {
+
+                // creates a new file named folder and sets it equal to f
                 File folder = new File(f);
 
-                // checks if its a directory
-                if (folder.isDirectory())
-                {
-                // creates a new FilenameFilter named filterMain
-                FilenameFilter filterMain = new FilenameFilter() {
-  
-                    public boolean accept(File f, String name)
-                    {
-                    // checks if it ends with .txt, .png, or .xml
-                    if (!name.endsWith(".txt") && !name.endsWith(".png") && !name.endsWith(".xml")){
-                    return true;
-                }
-                    return false;
-                }
-                };
 
-                // gets the folders
-                modFiles = folder.listFiles(filterMain);
-                modFolder = modFiles;
+                // checks if it's a directory
+                if (folder.isDirectory()) {
+                    // creates a new FilenameFilter named filterMain
+                    FilenameFilter filterMain = new FilenameFilter() {
 
-                // prints everything to console
-                System.out.println("folders:");
-                System.out.println(Arrays.toString(modFolder));
-
-                // for each folder in mod files
-                for (File g : modFiles) {
-
-                    // directory double check
-                    boolean directory = g.isDirectory();
-
-                    // if true run loop
-                    if (directory == true) {
-
-                    // creates new FilenameFilter name filterContents
-                    FilenameFilter filterContents = new FilenameFilter() {
-  
-                    public boolean accept(File f, String name)
-                    {
-                    // checks if it ends with .png, or .xml
-                    if (name.endsWith(".png") | name.endsWith(".xml")){
-                    return true;
-                    }
-                    return false;
-                    }
+                        public boolean accept(File f, String name) {
+                            // checks if it ends with .txt, .png, or .xml
+                            if (!name.endsWith(".txt") && !name.endsWith(".png") && !name.endsWith(".xml")) {
+                                return true;
+                            }
+                            return false;
+                        }
                     };
 
-                    // list the files and assign it to a variable named folderContents
-                    modFolderContents = g.listFiles(filterContents);
-                    System.out.println("folder contents:");
-                    System.out.println(Arrays.toString(modFolderContents)); 
+                    // gets the folders
+                    modFiles = folder.listFiles(filterMain);
+                    modFolder = modFiles;
 
-                    // for each file in modFolderContents do x
-                    for (File m : modFolderContents){
-                        System.out.println("file:");
-                        System.out.println(m);
+                    // prints everything to console
+                    System.out.println("folders:");
+                    System.out.println(Arrays.toString(modFolder));
 
+                    // for each folder in mod files do x
+                    for (File g : modFiles) {
 
-                        // write to jar
+                        // directory double check
+                        boolean directory = g.isDirectory();
 
+                        // if true run loop
+                        if (directory == true) {
 
+                            // writes the library folder for each mod
+                            if (g.toString().endsWith("library")) {
+                                FileUtils.copyDirectory(g, new File(source + "/library"));
+                                System.out.println("library directory copied: " + g);
+                            }
 
+                            // writes the textures folder for each mod
+                            if (g.toString().endsWith("textures")) {
+                                FileUtils.copyDirectory(g, new File(source + "/textures"));
+                                System.out.println("textures directory copied: " + g);
+                            }
 
+                            // creates new FilenameFilter named filterContents
+                            FilenameFilter filterContents = new FilenameFilter() {
+
+                                public boolean accept(File f, String name) {
+                                    // checks if it ends with .png, or .xml
+                                    if (name.endsWith(".png") | name.endsWith(".xml")) {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            };
+                            // list the files and assign it to a variable named folderContents
+                            modFolderContents = g.listFiles(filterContents);
+                        }
                     }
-
-
-                    }
-                }
                 } else {
                     // error messages
                     System.err.println("can't read");
                 }
             }
-
+            // messages
             System.out.println("...mods parsed...");
             modCounterDialog.setText("...Mods parsed...");
 
-            // do more stuff here after parsing, such as repack
-            
-            System.out.println("...packing .jar...");
-            modCounterDialog.setText("...Packing .jar...");
-
-            // set up the paths
-            sourceFile = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/");
-            outFilename = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/spacehaven.jar");
-
-            // pack the jar
-            org.zeroturnaround.zip.ZipUtil.pack(new File(String.valueOf(sourceFile)), new File(String.valueOf(outFilename)));
             // messages
-            System.out.println("... .jar packed...");
-            modCounterDialog.setText("... .jar packed...");
+            System.out.println("...merging data...");
+            modCounterDialog.setText("...merging data...");
 
-            } else {
-                // error messages
-                System.err.println("No mods selected");
-                modCounterDialog.setText("No mods selected");
+            // creates a list of files equal to source's current directory listing
+            File[] sourceFolders = source.listFiles();
+
+
+            // for each File f in source folders do such
+            for (File f : sourceFolders) {
+
+                // checks if it's the library folder
+                if (f.toString().endsWith("library") == true) {
+
+                    // creates a new file list for the library files
+                    File[] libraryFiles = f.listFiles();
+
+                    // checks if the animations.xml file exists, if not makes one
+                    if (!f.toString().startsWith(source + "\\library\\animations.xml")) {
+
+                        // creates a new file named animations-temp.xml in the library and a new java object for that file
+                        PrintWriter pw = new PrintWriter(source + "\\library\\animations.xml");
+                        File h = new File(source + "\\library\\animations.xml");
+
+                        System.out.println("writing data to new animations file");
+                        // if it is, write to it.
+                        FileUtils.write(h, "<AllAnimations> </AllAnimations>");
+
+                    }
+
+                    // checks if the haven.xml file exists, if not makes one
+                    if (!f.toString().startsWith(source + "\\library\\haven.xml")) {
+
+                        // creates a new file named haven-temp.xml in the library and a new java object for that file
+                        PrintWriter pw2 = new PrintWriter(source + "\\library\\haven.xml");
+                        File i = new File(source + "\\library\\haven.xml");
+
+                        System.out.println("writing data to new haven file");
+                        // if it is, write to it.
+                        FileUtils.write(i, "<data> </data>");
+
+                    }
+
+                    // checks if the texts.xml file exists, if not makes one
+                    if (!f.toString().startsWith(source + "\\library\\texts.xml")) {
+
+                        //creates a new file named texts-temp.xml in the library and a new java object for that file
+                        PrintWriter pw3 = new PrintWriter(source + "\\library\\texts.xml");
+                        File j = new File(source + "\\library\\texts.xml");
+
+                        System.out.println("writing data to new texts file");
+                        // if it is, write to it.
+                        FileUtils.write(j, "<t> </t>");
+
+                    }
+
+                    // for each file g in library files do such
+                    for (File g : libraryFiles) {
+
+                        // checks for the animations files and merges
+                        if (g.toString().startsWith(source + "\\library\\animations")) {
+                            System.out.println("animations found at: " + g);
+
+                            // merge
+                            System.out.print("Merging " + g + " ");
+                            Merge.mergeAnimationsTemp(g.toString(), source + "/library/animations.xml");
+
+                            // messages
+                            System.out.print("Merging complete ");
+
+                            // creates a path matcher
+                            final PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob3);
+
+                            // if g matches the glob3
+                            if (pathMatcher.matches(g.toPath())) {
+
+                                // messages
+                                System.out.println("...deleting animations file...");
+
+                                // delete
+                                Files.delete(g.toPath());
+
+                                // messages
+                                System.out.println("deleting animations file complete");
+                            }
+
+                        }
+
+                        // checks for the haven files and merges
+                        if (g.toString().startsWith(source + "\\library\\haven")) {
+
+                            // merge
+                            System.out.print("Merging " + g + " ");
+                            Merge.mergeHavenTemp(g.toString(), source + "/library/haven.xml");
+
+                            // messages
+                            System.out.print("Merging complete ");
+
+                            // creates a path matcher
+                            final PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob4);
+
+                            // if g matches the glob4
+                            if (pathMatcher.matches(g.toPath())) {
+
+                                // messages
+                                System.out.println("...deleting haven file...");
+
+                                // delete
+                                Files.delete(g.toPath());
+
+                                // messages
+                                System.out.println("deleting haven file complete");
+                            }
+
+                        }
+
+                        // checks for the texts files and merges
+                        if (g.toString().contains(source + "\\library\\texts")) {
+                            System.out.println("texts found at: " + g);
+
+                            // merge
+                            System.out.print("Merging " + g + " ");
+                            Merge.mergeTextsTemp(g.toString(), source + "/library/texts.xml");
+
+                            // messages
+                            System.out.print("Merging complete ");
+
+                            // creates a path matcher
+                            final PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob5);
+
+                            // if g matches the glob5
+                            if (pathMatcher.matches(g.toPath())) {
+
+                                // messages
+                                System.out.println("...deleting texts file...");
+
+                                // delete
+                                Files.delete(g.toPath());
+                                // messages
+                                System.out.println("deleting texts file complete");
+                            }
+                        }
+                    }
+                }
+
+                // check if it's the texture folder
+                if (f.toString().endsWith("textures") == true) {
+
+                    // creates a new file list for the texture files
+                    File[] texturesFiles = f.listFiles();
+
+                    for (File g : texturesFiles ){
+                        System.err.println(g.toString().replace(String.valueOf(source + "\\textures\\"), ""));
+                    }
+
+
+                }
             }
+
+            // messages
+            System.out.println("...source folders merged...");
+            modCounterDialog.setText("...source folders merged...");
+
+
+            // messages
+            //System.out.println("...packing .jar...");
+            //modCounterDialog.setText("...Packing .jar...");
+
+            // set up the paths (TODO: make default directory selectable (4))
+            source = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/");
+            outFileName = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/jarPacked.jar");
+
+            // repack the jar
+            //org.zeroturnaround.zip.ZipUtil.pack(new File(String.valueOf(source)), new File(String.valueOf(outFilename)));
+
+            // messages
+            //System.out.println("... .jar packed...");
+            //modCounterDialog.setText("... .jar packed...");
+
+            // messages
+            System.out.println("----- loaded ------");
+            modCounterDialog.setText("... loaded ...");
+
+            // run the game
+            //
+
+            //
+            //
+
+        } else {
+            // error messages
+            System.err.println("No mods selected");
+            modCounterDialog.setText("No mods selected");
+        }
     }
 
     public static void unzip(File archive, File destDir) throws IOException {
@@ -460,89 +630,60 @@ public class ModLoaderXController extends Application {
         //creates directory
         destDir.mkdirs();
 
-            try (JarFile jar = new JarFile(archive)) {
+        // create a new jar file set it equal to archive, then go thru the entries
+        // and for each entry create a new file, check if it's a directory and make one.
+        try (JarFile jar = new JarFile(archive)) {
             Enumeration<JarEntry> entries = jar.entries();
-                while (entries.hasMoreElements()) {
+            while (entries.hasMoreElements()) {
                 JarEntry ent = entries.nextElement();
                 File f = new File(destDir, ent.getName());
                 if (ent.isDirectory()) {
                     f.mkdir();
                     continue;
                 }
-            try (InputStream is = jar.getInputStream(ent);
-                 FileOutputStream os = new FileOutputStream(f)) {
-                for (int r; (r = is.read(buffer)) > 0; ) {
-                    os.write(buffer, 0, r);
-                }
-                }
-                }
-            }   
-    }
+                try (InputStream is = jar.getInputStream(ent);
+                     FileOutputStream os = new FileOutputStream(f)) {
+                    for (int r; (r = is.read(buffer)) > 0; ) {
+                        os.write(buffer, 0, r);
 
-    public void zip(){
-    
-        String srcFilename = sourceFile.toString();
-        File zipFile = outFilename;
+                    }
+                }
 
-        if (sourceFile.canWrite() == true) {
 
-        try {
-            byte[] buffer = new byte[1024];
-            FileOutputStream fos = new FileOutputStream(zipFile);
-            ZipOutputStream zos = new ZipOutputStream(fos);         
-            File srcFile = new File(srcFilename);
-            FileInputStream fis = new FileInputStream(srcFile);
-            zos.putNextEntry(new ZipEntry(srcFile.getName()));          
-            int length;
-            while ((length = fis.read(buffer)) > 0) {
-            zos.write(buffer, 0, length);
-            
             }
-            
-            zos.closeEntry();
-            fis.close();
-            zos.close();            
-        }
-        catch (IOException ioe) {
-            System.err.println("Error creating zip file" + ioe);
-            }       
-        } else {
-            System.err.println("can't read source!");   
         }
     }
 
-    public void exitButtonClicked()
-    {
+    public void exitButtonClicked() {
         // exits the program
         System.exit(0);
     }
 
-    public void helpButtonClicked()
-    {
+    public void helpButtonClicked() {
         // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.2.9 help");
+        alert.setTitle("Mod Loader X v0.3.0 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.2.9 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.3.0 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
     @FXML
-    public void initialize() throws IOException{
+    public void initialize() throws IOException {
 
         // header message
-        System.out.println("----- BEGINNING TO INITALIZE -----");
+        System.out.println("----- BEGINNING TO INITIALIZE -----");
 
         // setup the selected mods lists
-        selectedMods = new ArrayList<>();
+        selectedModsUI = new ArrayList<>();
         unloadedMods = new ArrayList<>();
         loadedInfos = new ArrayList<>();
-        System.out.println("ArrayLists for mods initalized!");
+        System.out.println("ArrayLists for mods initialized!");
 
         // setup the selected mods mod
-        Load.modVM = new mod();
-        Load.modML = new mod();
-        System.out.println("mods.class modVM and modML initalized!");
+        Load.modInfoVM = new info();
+        Load.modInfoML = new info();
+        System.out.println("mods.class modVM and modML initialized!");
 
         // setup the labels
         modDetails.setWrapText(true);
@@ -552,23 +693,21 @@ public class ModLoaderXController extends Application {
         Find.findInfos(glob, path);
 
         // find mods
-        findModsAndBuildMenu(glob2, path);    
+        findModsAndBuildMenu(glob2, path);
 
         // footer message
-        System.out.println("----- END INITALIZE -----");
-    }      
+        System.out.println("----- END INITIALIZE -----");
+    }
 
-    public static void main(String[] args) 
-    {
+    public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception 
-    { 
+    public void start(Stage primaryStage) throws Exception {
         // creates the root, sets it equal to the .fxml file and then sets the stage
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.2.9");
+        primaryStage.setTitle("Mod Loader X v0.3.0");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();

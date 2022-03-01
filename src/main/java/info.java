@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 //  </mod> 
 
 @XmlRootElement(name = "mod")
-public class mod {
+public class info {
 
     @XmlElement
     String name;
