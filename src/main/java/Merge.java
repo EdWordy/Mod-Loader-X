@@ -8,7 +8,7 @@ public class Merge {
         VTDGen vg = new VTDGen();
         if (!vg.parseFile(one, false))
             return;
-        VTDNav vn1=vg.getNav();
+        VTDNav vn1 = vg.getNav();
         if(!vg.parseFile(two, false))
             return;
         VTDNav vn2 = vg.getNav();
@@ -22,7 +22,7 @@ public class Merge {
         VTDGen vg = new VTDGen();
         if (!vg.parseFile(one, false))
             return;
-        VTDNav vn1=vg.getNav();
+        VTDNav vn1 = vg.getNav();
         if(!vg.parseFile(two, false))
             return;
         VTDNav vn2 = vg.getNav();
@@ -33,10 +33,11 @@ public class Merge {
     }
 
     public static void mergeTextsTemp(String one, String two) throws NavException, ModifyException, TranscodeException, IOException {
+
         VTDGen vg = new VTDGen();
         if (!vg.parseFile(one, false))
             return;
-        VTDNav vn1=vg.getNav();
+        VTDNav vn1 = vg.getNav();
         if(!vg.parseFile(two, false))
             return;
         VTDNav vn2 = vg.getNav();
@@ -46,4 +47,4 @@ public class Merge {
         xm.output(ModLoaderXController.source + "\\library\\texts.xml" );
     }
 
-}
+  }

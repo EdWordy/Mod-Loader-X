@@ -29,7 +29,6 @@ public class Load {
             // marshal and output to string writer
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.marshal(modInfoVM, sw);
         }
         return null;
@@ -52,7 +51,6 @@ public class Load {
             // marshal and output to stringwriter
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.marshal(modInfoML, sw);
         }
         return null;

@@ -17,6 +17,9 @@ import org.apache.commons.io.FileUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -29,6 +32,8 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class ModLoaderXController extends Application {
 
@@ -75,6 +80,12 @@ public class ModLoaderXController extends Application {
     public String glob4 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/haven_****************";  // mod asset name length max 5 + 16 characters
 
     public String glob5 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/texts_****************";  // mod asset name length max 5 + 16 characters
+
+    public String glob6 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/animations";
+
+    public String glob7 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/haven";
+
+    public String glob8 = "glob:F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/source/library/texts";
 
     public static String path = "F:/Games/SteamLibrary/steamapps/common/SpaceHaven/mods/";
 
@@ -321,7 +332,7 @@ public class ModLoaderXController extends Application {
         }
     }
 
-    public void loadAndLaunch() throws IOException, NavException, ModifyException, TranscodeException {
+    public void loadAndLaunch() throws IOException, NavException, ModifyException, TranscodeException, ParserConfigurationException, TransformerException, SAXException, XMLStreamException {
 
         // messages
         System.out.println("----- loading -----");
@@ -343,7 +354,7 @@ public class ModLoaderXController extends Application {
             // unpack jar
             //modCounterDialog.setText("... .jar unpacking...");
             //unzip(jar, source);
-            //org.zeroturnaround.zip.ZipUtil.unpack(jar, source);
+            org.zeroturnaround.zip.ZipUtil.unpack(jar, source);
 
             // messages
             //System.out.println(".Jar Unpacked!");
@@ -446,7 +457,7 @@ public class ModLoaderXController extends Application {
                     File[] libraryFiles = f.listFiles();
 
                     // checks if the animations.xml file exists, if not makes one
-                    if (!f.toString().startsWith(source + "\\library\\animations.xml")) {
+                    if (!f.toString().startsWith(source + "\\library\\animations")) {
 
                         // creates a new file named animations-temp.xml in the library and a new java object for that file
                         PrintWriter pw = new PrintWriter(source + "\\library\\animations.xml");
@@ -459,7 +470,7 @@ public class ModLoaderXController extends Application {
                     }
 
                     // checks if the haven.xml file exists, if not makes one
-                    if (!f.toString().startsWith(source + "\\library\\haven.xml")) {
+                    if (!f.toString().startsWith(source + "\\library\\haven")) {
 
                         // creates a new file named haven-temp.xml in the library and a new java object for that file
                         PrintWriter pw2 = new PrintWriter(source + "\\library\\haven.xml");
@@ -472,7 +483,7 @@ public class ModLoaderXController extends Application {
                     }
 
                     // checks if the texts.xml file exists, if not makes one
-                    if (!f.toString().startsWith(source + "\\library\\texts.xml")) {
+                    if (!f.toString().startsWith(source + "\\library\\texts")) {
 
                         //creates a new file named texts-temp.xml in the library and a new java object for that file
                         PrintWriter pw3 = new PrintWriter(source + "\\library\\texts.xml");
@@ -503,7 +514,6 @@ public class ModLoaderXController extends Application {
 
                             // if g matches the glob3
                             if (pathMatcher.matches(g.toPath())) {
-
                                 // messages
                                 System.out.println("...deleting animations file...");
 
@@ -512,6 +522,21 @@ public class ModLoaderXController extends Application {
 
                                 // messages
                                 System.out.println("deleting animations file complete");
+                            }
+
+                            // creates a path matcher
+                            final PathMatcher pathMatcher2 = FileSystems.getDefault().getPathMatcher(glob6);
+
+                            // if g matches the og animations.file
+                            if (pathMatcher2.matches(g.toPath())) {
+                                // messages
+                                System.out.println("...deleting og animations file...");
+
+                                // delete
+                                Files.delete(g.toPath());
+
+                                // messages
+                                System.out.println("deleting og animations file complete");
                             }
 
                         }
@@ -542,7 +567,38 @@ public class ModLoaderXController extends Application {
                                 System.out.println("deleting haven file complete");
                             }
 
+                            // creates a path matcher
+                            final PathMatcher pathMatcher2 = FileSystems.getDefault().getPathMatcher(glob7);
+
+                            // if g matches the og haven.file delete it
+                            if (pathMatcher2.matches(g.toPath())) {
+
+                                // messages
+                                System.out.println("...deleting og haven file...");
+
+                                // delete
+                                Files.delete(g.toPath());
+
+                                // messages
+                                System.out.println("deleting og haven file complete");
+                            }
+
+
                         }
+
+
+                        // replace the fucking ampersands because VTD can't handle them
+                        if (g.toString().startsWith(source + "\\library\\texts") && !g.toString().endsWith(".xml")) {
+
+                            System.err.println("file to replace found at " + g);
+
+                            //replace ampersands
+                            replaceInFile(g);
+
+                            //replace the escape key (fuck this key)
+                            replaceInFile2(g);
+
+                         }
 
                         // checks for the texts files and merges
                         if (g.toString().contains(source + "\\library\\texts")) {
@@ -550,7 +606,7 @@ public class ModLoaderXController extends Application {
 
                             // merge
                             System.out.print("Merging " + g + " ");
-                            Merge.mergeTextsTemp(g.toString(), source + "/library/texts.xml");
+                            Merge.mergeTextsTemp(g.toString(), source + "\\library\\texts.xml");
 
                             // messages
                             System.out.print("Merging complete ");
@@ -566,9 +622,27 @@ public class ModLoaderXController extends Application {
 
                                 // delete
                                 Files.delete(g.toPath());
+
                                 // messages
                                 System.out.println("deleting texts file complete");
                             }
+
+                            // creates a path matcher
+                            final PathMatcher pathMatcher2 = FileSystems.getDefault().getPathMatcher(glob8);
+
+                            // if g matches the og texts file delete it
+                            if (pathMatcher2.matches(g.toPath())) {
+
+                                // messages
+                                System.out.println("...deleting og texts file...");
+
+                                // delete
+                                Files.delete(g.toPath());
+
+                                // messages
+                                System.out.println("deleting og texts file complete");
+                            }
+
                         }
                     }
                 }
@@ -580,7 +654,9 @@ public class ModLoaderXController extends Application {
                     File[] texturesFiles = f.listFiles();
 
                     for (File g : texturesFiles ){
-                        System.err.println(g.toString().replace(String.valueOf(source + "\\textures\\"), ""));
+
+
+                        //System.err.println(g.toString().replace(String.valueOf(source + "\\textures\\"), ""));
                     }
 
 
@@ -624,6 +700,55 @@ public class ModLoaderXController extends Application {
         }
     }
 
+    public void replaceInFile(File file) throws IOException {
+
+        //
+        System.err.println("removing ampersand");
+
+        // creates a new
+        File temp = File.createTempFile("newfile", ".txt");
+        FileWriter fw = new FileWriter(String.valueOf(temp));
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        // while the br is ready do find and replace
+        while (br.ready()) {
+            fw.write(br.readLine().replace("&", "and"));
+        }
+        // close the streams
+        fw.close();
+        br.close();
+
+        Files.copy(temp.toPath(), file.toPath(), REPLACE_EXISTING);
+
+        //
+        System.err.println("ampersand removed");
+    }
+
+    public void replaceInFile2(File file) throws IOException {
+
+        //
+        System.err.println("removing special character");
+
+        // creates a new
+        File temp = File.createTempFile("newfile", ".txt");
+        FileWriter fw = new FileWriter(String.valueOf(temp));
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        while (br.ready()) {
+            // while the br is ready do find and replace
+            fw.write(br.readLine().replaceAll("\\u001B", ""));
+        }
+
+        // close the streams
+        fw.close();
+        br.close();
+
+        Files.copy(temp.toPath(), file.toPath(), REPLACE_EXISTING);
+
+        //
+        System.err.println("special character removed");
+    }
+
     public static void unzip(File archive, File destDir) throws IOException {
         //creates a new buffer
         byte[] buffer = new byte[256 * 1024];
@@ -662,11 +787,12 @@ public class ModLoaderXController extends Application {
     public void helpButtonClicked() {
         // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.3.0 help");
+        alert.setTitle("Mod Loader X v0.3.1 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.3.0 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.3.1 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
+
 
     @FXML
     public void initialize() throws IOException {
@@ -707,7 +833,7 @@ public class ModLoaderXController extends Application {
     public void start(Stage primaryStage) throws Exception {
         // creates the root, sets it equal to the .fxml file and then sets the stage
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.3.0");
+        primaryStage.setTitle("Mod Loader X v0.3.1");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();
