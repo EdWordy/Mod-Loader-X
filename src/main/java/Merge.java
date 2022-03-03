@@ -15,7 +15,7 @@ public class Merge {
         XMLModifier xm = new XMLModifier(vn1);
         long l = vn2.getContentFragment();
         xm.insertBeforeTail(vn2, l);
-        xm.output(ModLoaderXController.source + "\\library\\animations.xml" );
+        xm.output(ModLoaderXController.source + "\\mods\\source\\library\\animations" );
     }
 
     public static void mergeHavenTemp (String one, String two) throws NavException, ModifyException, TranscodeException, IOException {
@@ -29,7 +29,7 @@ public class Merge {
         XMLModifier xm = new XMLModifier(vn1);
         long l = vn2.getContentFragment();
         xm.insertBeforeTail(vn2, l);
-        xm.output(ModLoaderXController.source + "\\library\\haven.xml" );
+        xm.output(ModLoaderXController.source + "\\mods\\source\\library\\haven" );
     }
 
     public static void mergeTextsTemp(String one, String two) throws NavException, ModifyException, TranscodeException, IOException {
@@ -44,7 +44,7 @@ public class Merge {
         XMLModifier xm = new XMLModifier(vn1);
         long l = vn2.getContentFragment();
         xm.insertBeforeTail(vn2, l);
-        xm.output(ModLoaderXController.source + "\\library\\texts.xml" );
+        xm.output(ModLoaderXController.source + "\\mods\\source\\library\\texts" );
     }
 
   }
