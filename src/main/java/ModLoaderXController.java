@@ -333,7 +333,7 @@ public class ModLoaderXController extends Application {
             modCounterDialog.setText("...Loading...");
 
             // setups the paths to unpack
-            jar = new File("F:/Games/SteamLibrary/steamapps/common/SpaceHaven/spacehaven.jar");
+            jar = new File(source + "\\spacehaven.jar");
             sourceFolder = new File(source + "\\mods\\source\\");
 
             // unpack jar
