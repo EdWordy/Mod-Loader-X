@@ -29,6 +29,8 @@ CURRENT FEATURES:
 
 -loading and reading the .jar
 
+-writing a modid.cim file
+
 - ...
 
 
@@ -38,8 +40,6 @@ TO DO:
 -launcher method (unpack and repacks jar with modded assets and generates a textures file) (80% DONE)
 
 -writing a generated_textures.xml file
-
--writing a custom_textures_modid.png file
 
 -more features!
 
