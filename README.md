@@ -67,6 +67,6 @@ NOTES:
 
 -When composing your XML files (haven, animations, texts, etc), please DO NOT use ampersands as they EXPLODE the parser and merge functions. You've been warned.
 
--When choosing the file directory, select the root game directory (where the spacehaven.jar). The modloader will take care of the rest.
+-When choosing the file directory, select the root game directory (where the spacehaven.jar is). The modloader will take care of the rest.
 
 - ...
