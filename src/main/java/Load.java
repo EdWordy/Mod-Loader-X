@@ -31,7 +31,7 @@ public class Load {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(modInfoVM, sw);
         }
-        return null;
+        return modInfoVM;
     }
 
     public static info loadInfoML() throws JAXBException, IOException {
@@ -45,23 +45,16 @@ public class Load {
             modInfoML = (info) context.createUnmarshaller().unmarshal(new FileReader(ModLoaderXController.infoToReadML.replaceAll("[\\p{Ps}\\p{Pe}]", "").concat("\\info.xml")));
 
 
-            // initialize new stringwriter
+            // initialize new string writer
             sw = new StringWriter();
 
-            // marshal and output to stringwriter
+            // marshal and output to string writer
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(modInfoML, sw);
         }
-        return null;
+        return modInfoML;
     }
-
-    public void loadData(){
-
-
-
-    }
-
 }
 
 

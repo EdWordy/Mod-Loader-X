@@ -31,6 +31,13 @@ public class info {
     @XmlElement
     String modid;
 
+    public info(String currentMod) {
+        ModLoaderXController.currentModID = Integer.parseInt(modid);
+    }
+
+    public info() {
+    }
+
     public String getName() {
         return name;
     }

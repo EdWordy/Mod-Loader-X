@@ -13,7 +13,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="600.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ModLoaderXController">
+<VBox prefHeight="600.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ModLoaderXController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -26,7 +26,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.3.0" />
+            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.3.2" />
           </items>
         </Menu>
       </menus>
