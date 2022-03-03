@@ -1,5 +1,5 @@
 # Mod-Loader-X
-version 0.2.9
+version 0.3.2
 
 A modloader for Space Haven written in Java 8.
 
@@ -58,3 +58,11 @@ Download the latest release and run the executable jar file. You'll need java 8 
 THANKS TO:
 
 Paperfox, Gravelyn, Neato, SagaciousZed and a few others, along with Bugbyte. Cheers!
+
+---
+
+NOTES:
+
+-When composing your XML files (haven, animations, texts, etc), please DO NOT use ampersands as they EXPLODE the parser and merge functions. You've been warned.
+
+- ...
