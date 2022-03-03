@@ -1,5 +1,5 @@
 # Mod-Loader-X4
-version 0.3.2
+version 0.3.3
 
 A modloader for Space Haven written in Java 8.
 
@@ -30,6 +30,8 @@ CURRENT FEATURES:
 -loading and reading the .jar
 
 -writing a modid.cim file
+
+-a selectable root game directory (the folder where the spacehaven.jar is)
 
 - ...
 
