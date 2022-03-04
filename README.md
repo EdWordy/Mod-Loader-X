@@ -1,5 +1,5 @@
 # Mod-Loader-X4
-version 0.3.4
+version 0.3.5
 
 A modloader for Space Haven written in Java 8.
 
@@ -33,15 +33,18 @@ CURRENT FEATURES:
 
 -a selectable root game directory (the folder where the spacehaven.jar is)
 
+-launcher method (unpack and repacks jar with modded assets and generates a textures file)
+
+-writing a generated_textures.xml file
+
+
 - ...
 
 
 
 TO DO:
 
--launcher method (unpack and repacks jar with modded assets and generates a textures file) (80% DONE)
-
--writing a generated_textures.xml file
+-solving the stackOverFlowError in-game (GAME BREAKING)
 
 -more features!
 
