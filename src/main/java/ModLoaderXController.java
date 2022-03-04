@@ -16,16 +16,23 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class ModLoaderXController extends Application {
@@ -90,6 +97,10 @@ public class ModLoaderXController extends Application {
 
     public File sourceFolder;
 
+    public int currentTextureCount;
+
+    public int currentRegionCount;
+
     @FXML
     public AnchorPane anchorPaneML;
 
@@ -110,6 +121,9 @@ public class ModLoaderXController extends Application {
 
     @FXML
     public Label modDetails;
+
+    public ModLoaderXController() throws ParserConfigurationException {
+    }
 
     public void addMod() {
         // null check
@@ -323,7 +337,7 @@ public class ModLoaderXController extends Application {
         }
     }
 
-    public void loadAndLaunch() throws IOException, NavException, ModifyException, TranscodeException, JAXBException {
+    public void loadAndLaunch() throws IOException, NavException, ModifyException, TranscodeException, JAXBException, ParserConfigurationException, TransformerException {
 
         // checks if selectedModsUI is not empty
         if (!selectedModsUI.isEmpty()) {
@@ -590,20 +604,25 @@ public class ModLoaderXController extends Application {
                                     settings.maxWidth = 2048;
                                     settings.maxHeight = 2048;
                                     settings.outputFormat = "cim";
+                                    settings.square = true;
                                     TexturePacker texturePacker = new TexturePacker(a, settings);
 
+                                    // set i1 equal to sourceLength
                                     int i1 = Math.toIntExact(sourceLength);
 
-                                    System.out.println(i1);
+                                    // sets up the region and texture count
+                                    currentTextureCount = 1;
+                                    currentRegionCount = 0;
 
                                     // for each file g in textureFiles do x
                                     for (File g : texturesFiles) {
 
                                         // checks if the texture contains the mod id
-                                        if (g.toString().startsWith(String.valueOf(currentModID), i1) && !g.toString().endsWith(".cim")) {
+                                        if (g.toString().startsWith(String.valueOf(currentModID), i1) && !g.toString().endsWith(".cim") && !g.toString().endsWith(".atlas")) {
                                             // add the images from textureFiles
                                             texturePacker.addImage(g);
                                             System.out.println("adding texture " + g);
+                                            currentRegionCount++;
                                         }
                                         //System.err.println(g.toString().replace(String.valueOf(source + "\\textures\\"), ""));
                                         // delete the texture as its no longer needed
@@ -612,9 +631,17 @@ public class ModLoaderXController extends Application {
                                     // pack the cim based on mod id
                                     texturePacker.pack(new File(source + "\\mods\\source\\textures\\"), String.valueOf(currentModID));
 
+                                    // set i2 equal sourceLength
                                     int i2 = Math.toIntExact(sourceLength);
 
-                                    System.out.println(i2);
+                                    // messages
+                                    System.out.println("generating textures files");
+
+                                    //
+                                    generateTexturesFile();
+
+                                    // messages
+                                    System.out.println(currentModID + "_textures.xml generated");
 
                                     // for each file g in textureFiles do x
                                     for (File k : texturesFiles) {
@@ -625,10 +652,8 @@ public class ModLoaderXController extends Application {
                                             Files.delete(k.toPath());
                                             System.out.println("deleting texture " + k);
                                         }
+
                                     }
-
-                                    // TO DO: generate textures file
-
 
                                 }
                                 // increment i for the while loop
@@ -637,7 +662,7 @@ public class ModLoaderXController extends Application {
                         }
                     }
                 }
-            }
+
 
                 // copy the CIMs to the library
                 FileUtils.copyDirectory(new File(source + "\\mods\\source\\textures\\"), new File(source + "\\mods\\source\\library"));
@@ -679,6 +704,8 @@ public class ModLoaderXController extends Application {
                 //
                 //
 
+
+            }
         } else {
             // error messages
             System.err.println("No mods selected");
@@ -690,16 +717,17 @@ public class ModLoaderXController extends Application {
 
         // creates a new
         File temp = File.createTempFile("newfile", ".txt");
-        FileWriter fw = new FileWriter(String.valueOf(temp));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(String.valueOf(temp)));
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         // while the br is ready write and replace
         while (br.ready()) {
-            fw.write(br.readLine().replace("&", "and"));
+            bw.write(br.readLine().replace("&", "and"));
+            bw.newLine();
         }
 
         // close the streams
-        fw.close();
+        bw.close();
         br.close();
 
         // copy the files from temp to file
@@ -710,16 +738,17 @@ public class ModLoaderXController extends Application {
 
         // creates a new
         File temp = File.createTempFile("newfile", ".txt");
-        FileWriter fw = new FileWriter(String.valueOf(temp));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(String.valueOf(temp)));
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         while (br.ready()) {
             // while the br is ready write and replace
-            fw.write(br.readLine().replaceAll("\\u001B", ""));
+            bw.write(br.readLine().replaceAll("\\u001B", ""));
+            bw.newLine();
         }
 
         // close the streams
-        fw.close();
+        bw.close();
         br.close();
 
         // copy the files from temp to file
@@ -734,9 +763,9 @@ public class ModLoaderXController extends Application {
     public void helpButtonClicked() {
         // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.3.4 help");
+        alert.setTitle("Mod Loader X v0.3.5 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.3.4 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.3.5 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
@@ -763,6 +792,146 @@ public class ModLoaderXController extends Application {
             findModsAndBuildMenu(glob2, String.valueOf(source));
         }
     }
+
+    public Element t;
+
+    public Element re;
+
+    public int textureIndex = 8251;
+
+    public void generateTexturesFile() throws IOException, ParserConfigurationException, TransformerException {
+
+        BufferedReader br = new BufferedReader(new FileReader(source + "\\mods\\source\\textures\\" + currentModID + ".atlas"));
+
+        System.out.println("..generating texture beginning sequence...");
+
+        // instantiate the DOM pieces
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = factory.newDocumentBuilder();
+        Document doc = dBuilder.newDocument();
+
+        // create the root element node
+        Element element = doc.createElement("AllTexturesAndRegions");
+        doc.appendChild(element);
+
+        // create the textures element
+        Element texturesElement = doc.createElement("textures");
+        element.appendChild(texturesElement);
+
+        // create the regions element
+        Element regionsElement = doc.createElement("regions");
+        element.appendChild(regionsElement);
+
+        String currentLine;
+
+        // while the br is not null do x
+        while ((currentLine = br.readLine()) != null) {
+
+            // if current line matches mod id do x
+            if (currentLine.startsWith(String.valueOf(currentModID))) {
+
+                // split the string by the dot
+                String[] split = currentLine.split("\\.");
+
+                // assign parts
+                String part1 = split[0];
+
+                // create the tElement
+                t = doc.createElement("t");
+                texturesElement.appendChild(t);
+
+                // map to an attribute
+                t.setAttribute("i", part1);
+            }
+
+            //
+            if (currentLine.startsWith("size:")) {
+
+                // replace size: in the string
+                String replaced = currentLine.replace("size:", "");
+
+                // split the string by the comma
+                String[] split = replaced.split(",");
+
+                // assign parts
+                String part1 = split[0];
+                String part2 = split[1];
+
+                // map to an attribute
+                t.setAttribute("h", part1.trim());
+                t.setAttribute("w", part2.trim());
+            }
+
+            //
+            if (currentLine.startsWith("source/textures/")){
+
+                // replace the prefix
+                String replaced = currentLine.replace("source/textures/", "");
+
+                // concatenate on .png
+                String concat = replaced.concat(".png");
+
+                // create the re element
+                re = doc.createElement("re");
+                regionsElement.appendChild(re);
+
+                // map to attributes
+                re.setAttribute("file", concat);
+                re.setAttribute("n", String.valueOf(textureIndex + 1));
+
+                //increment the index
+                textureIndex++;
+            }
+
+            // if current line starts with xy: do z
+            if (currentLine.startsWith("  xy:")) {
+
+                //  replace the xy
+                String replaced = currentLine.replace("xy:", "");
+
+                // split the string by the comma
+                String[] split = replaced.split(",");
+
+                // assign parts
+                String part1 = split[0];
+                String part2 = split[1];
+
+                // map to attributes
+                re.setAttribute("x", part1.trim());
+                re.setAttribute("y", part2.trim());
+            }
+
+            // if current line starts with orig: do x
+            if (currentLine.startsWith("  orig:")){
+
+                // replace the orig
+                String replaced = currentLine.replace("orig:", "");
+
+                // split the string by the comma
+                String[] split = replaced.split(",");
+
+                // assign parts
+                String part1 = split[0];
+                String part2 = split[1];
+
+                // map to attributes
+                re.setAttribute("w", part1.trim());
+                re.setAttribute("h", part2.trim());
+            }
+        }
+        // close the br
+        br.close();
+
+        // create the transformer to output the document
+        Transformer tf = TransformerFactory.newInstance().newTransformer();
+        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        tf.setOutputProperty(OutputKeys.INDENT, "yes");
+        Result output = new StreamResult(new File(source + "\\mods\\source\\textures\\" + currentModID + "_textures.xml"));
+        tf.transform(new DOMSource(doc), output);
+
+        Files.delete(Paths.get(source + "\\mods\\source\\textures\\" + currentModID + ".atlas"));
+    }
+
 
     @FXML
     public void initialize() throws IOException {
@@ -821,7 +990,7 @@ public class ModLoaderXController extends Application {
     public void start(Stage primaryStage) throws Exception {
         // creates the root, sets it equal to the .fxml file and then sets the stage
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.3.4");
+        primaryStage.setTitle("Mod Loader X v0.3.5");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();
