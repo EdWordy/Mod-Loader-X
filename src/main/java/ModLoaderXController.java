@@ -16,7 +16,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -27,7 +26,6 @@ import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class ModLoaderXController extends Application {
@@ -85,6 +83,8 @@ public class ModLoaderXController extends Application {
     public static File jar;
 
     public static File source;
+
+    public long sourceLength;
 
     public File outFileName;
 
@@ -592,11 +592,15 @@ public class ModLoaderXController extends Application {
                                     settings.outputFormat = "cim";
                                     TexturePacker texturePacker = new TexturePacker(a, settings);
 
+                                    int i1 = Math.toIntExact(sourceLength);
+
+                                    System.out.println(i1);
+
                                     // for each file g in textureFiles do x
                                     for (File g : texturesFiles) {
 
                                         // checks if the texture contains the mod id
-                                        if (g.toString().startsWith(String.valueOf(currentModID), 71) && !g.toString().endsWith(".atlas") && !g.toString().endsWith(".cim")) {
+                                        if (g.toString().startsWith(String.valueOf(currentModID), i1) && !g.toString().endsWith(".cim")) {
                                             // add the images from textureFiles
                                             texturePacker.addImage(g);
                                             System.out.println("adding texture " + g);
@@ -608,12 +612,16 @@ public class ModLoaderXController extends Application {
                                     // pack the cim based on mod id
                                     texturePacker.pack(new File(source + "\\mods\\source\\textures\\"), String.valueOf(currentModID));
 
+                                    int i2 = Math.toIntExact(sourceLength);
+
+                                    System.out.println(i2);
+
                                     // for each file g in textureFiles do x
                                     for (File k : texturesFiles) {
 
                                         // checks if the texture contains the mod id
-                                        if (k.toString().startsWith(String.valueOf(currentModID), 71) && !k.toString().endsWith(".atlas") && !k.toString().endsWith(".cim")) {
-                                            // delete the texutre file
+                                        if (k.toString().startsWith(String.valueOf(currentModID), i2) && !k.toString().endsWith(".cim")) {
+                                            // delete the texture file
                                             Files.delete(k.toPath());
                                             System.out.println("deleting texture " + k);
                                         }
@@ -630,6 +638,7 @@ public class ModLoaderXController extends Application {
                     }
                 }
             }
+
                 // copy the CIMs to the library
                 FileUtils.copyDirectory(new File(source + "\\mods\\source\\textures\\"), new File(source + "\\mods\\source\\library"));
                 System.out.println("CIM copied!");
@@ -725,20 +734,25 @@ public class ModLoaderXController extends Application {
     public void helpButtonClicked() {
         // creates a new alert popup box when the help button is clicked
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mod Loader X v0.3.3 help");
+        alert.setTitle("Mod Loader X v0.3.4 help");
         alert.setHeaderText(null);
-        alert.setContentText("Mod Loader X v0.3.3 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
+        alert.setContentText("Mod Loader X v0.3.4 was written in java 8 using javafx8 and was intended for use with the game Space Haven alpha 14.1.");
         alert.showAndWait();
     }
 
     public void chooseDirectory() throws IOException {
 
-        // set the selectedDirectory equal to the directoryChooser dialog answer
-        // then set that equal to source
+        // set the selectedDirectory equal to the
+        // directoryChooser dialog answer then set that equal to source
         File selectedDirectory = directoryChooser.showDialog(primaryStage);
         source = selectedDirectory;
 
-        // checks if unloadedMods is empty before populating the list
+        // set source length for texture parsing
+        // 22 is the value of the directories after source
+        sourceLength = source.toString().length() + 22;
+
+        // checks if unloadedMods is empty
+        // before populating the list
         // to avoid duplicates and such
         if (unloadedMods.isEmpty()) {
 
@@ -780,12 +794,17 @@ public class ModLoaderXController extends Application {
 
         // null check
         if (source != null) {
+            // set source length for texture parsing
+            // 22 is the value of the directories after source
+            sourceLength = source.toString().length() + 22;
+
             // check for info.xml
-            Find.findInfos(glob, String.valueOf(source + "\\mods\\"));
+            Find.findInfos(glob, source + "\\mods\\");
 
             // find mods
-            findModsAndBuildMenu(glob2, String.valueOf(source + "\\mods\\"));
+            findModsAndBuildMenu(glob2, source + "\\mods\\");
         } else {
+            // error messages
             System.err.println("Couldn't find root game directory (folder containing spacehaven.jar");
             modDetails.setText("Couldn't find root game directory (folder containing spacehaven.jar");
         }
@@ -802,7 +821,7 @@ public class ModLoaderXController extends Application {
     public void start(Stage primaryStage) throws Exception {
         // creates the root, sets it equal to the .fxml file and then sets the stage
         Parent root = FXMLLoader.load(getClass().getResource("ModLoaderUI.fxml"));
-        primaryStage.setTitle("Mod Loader X v0.3.3");
+        primaryStage.setTitle("Mod Loader X v0.3.4");
         primaryStage.setScene(new Scene(root, 1400, 600));
         primaryStage.setResizable(false);
         primaryStage.show();

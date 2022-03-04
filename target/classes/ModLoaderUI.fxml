@@ -26,7 +26,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.3.2" />
+            <MenuItem mnemonicParsing="false" onAction="#helpButtonClicked" text="About Mod Loader X v0.3.4" />
           </items>
         </Menu>
       </menus>
